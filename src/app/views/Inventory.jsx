@@ -1,1 +1,119 @@
-import React,{useState}from'react';import{useSelector,useDispatch}from'react-redux';import CrudModule from'../components/CrudModule';import{ADDUSAGE}from'../redux/actions/inventory';import{SHOWTOAST}from'../redux/actions/ui';export default function Inventory(){const items=useSelector(s=>s.inventory.items),user=useSelector(s=>s.user.user),dispatch=useDispatch(),[form,setForm]=useState({id:'',quantity:'',date:new Date().toISOString().slice(0,10),note:''});return <><CrudModule module="inventory"/><section className="section-card mt-4"><div className="section-heading"><div><span className="eyebrow">STOCK MOVEMENT</span><h2>Record input usage</h2><p>Usage reduces quantity and keeps a dated history.</p></div></div><form className="row g-3" onSubmit={async e=>{e.preventDefault();try{await dispatch(ADDUSAGE({...form,user:user.username}));dispatch(SHOWTOAST('Usage recorded'));setForm({...form,quantity:'',note:''})}catch(e){dispatch(SHOWTOAST(e.message,'danger'))}}}><div className="col-md-3"><select required className="form-select" value={form.id} onChange={e=>setForm({...form,id:e.target.value})}><option value="">Select item</option>{items.map(x=><option key={x.id} value={x.id}>{x.item} ({x.qty} {x.unit})</option>)}</select></div><div className="col-md-2"><input required type="number" min="0.01" step="any" className="form-control" placeholder="Quantity" value={form.quantity} onChange={e=>setForm({...form,quantity:e.target.value})}/></div><div className="col-md-2"><input required type="date" className="form-control" value={form.date} onChange={e=>setForm({...form,date:e.target.value})}/></div><div className="col-md-3"><input className="form-control" placeholder="Note" value={form.note} onChange={e=>setForm({...form,note:e.target.value})}/></div><div className="col-md-2"><button className="btn btn-brand w-100">Record usage</button></div></form><div className="table-responsive mt-4"><table className="table"><thead><tr><th>Item</th><th>Date</th><th>Quantity</th><th>Note</th><th>User</th></tr></thead><tbody>{items.flatMap(i=>(i.usageHistory||[]).map(u=><tr key={u.id}><td>{i.item}</td><td>{u.date}</td><td>{u.quantity} {i.unit}</td><td>{u.note||'—'}</td><td>{u.user}</td></tr>))}</tbody></table></div></section></>}
+import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import CrudModule from "../components/CrudModule";
+import { ADDUSAGE } from "../redux/actions/inventory";
+import { SHOWTOAST } from "../redux/actions/ui";
+export default function Inventory() {
+  const items = useSelector((s) => s.inventory.items),
+    user = useSelector((s) => s.user.user),
+    dispatch = useDispatch(),
+    [form, setForm] = useState({
+      id: "",
+      quantity: "",
+      date: new Date().toISOString().slice(0, 10),
+      note: "",
+    });
+  return (
+    <>
+      <CrudModule module="inventory" />
+      <section className="section-card mt-4">
+        <div className="section-heading">
+          <div>
+            <span className="eyebrow">STOCK MOVEMENT</span>
+            <h2>Record input usage</h2>
+            <p>Usage reduces quantity and keeps a dated history.</p>
+          </div>
+        </div>
+        <form
+          className="row g-3"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            try {
+              await dispatch(ADDUSAGE({ ...form, user: user.username }));
+              dispatch(SHOWTOAST("Usage recorded"));
+              setForm({ ...form, quantity: "", note: "" });
+            } catch (e) {
+              dispatch(SHOWTOAST(e.message, "danger"));
+            }
+          }}
+        >
+          <div className="col-md-3">
+            <select
+              required
+              className="form-select"
+              value={form.id}
+              onChange={(e) => setForm({ ...form, id: e.target.value })}
+            >
+              <option value="">Select item</option>
+              {items.map((x) => (
+                <option key={x.id} value={x.id}>
+                  {x.item} ({x.qty} {x.unit})
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="col-md-2">
+            <input
+              required
+              type="number"
+              min="0.01"
+              step="any"
+              className="form-control"
+              placeholder="Quantity"
+              value={form.quantity}
+              onChange={(e) => setForm({ ...form, quantity: e.target.value })}
+            />
+          </div>
+          <div className="col-md-2">
+            <input
+              required
+              type="date"
+              className="form-control"
+              value={form.date}
+              onChange={(e) => setForm({ ...form, date: e.target.value })}
+            />
+          </div>
+          <div className="col-md-3">
+            <input
+              className="form-control"
+              placeholder="Note"
+              value={form.note}
+              onChange={(e) => setForm({ ...form, note: e.target.value })}
+            />
+          </div>
+          <div className="col-md-2">
+            <button className="btn btn-brand w-100">Record usage</button>
+          </div>
+        </form>
+        <div className="table-responsive mt-4">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Date</th>
+                <th>Quantity</th>
+                <th>Note</th>
+                <th>User</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.flatMap((i) =>
+                (i.usageHistory || []).map((u) => (
+                  <tr key={u.id}>
+                    <td>{i.item}</td>
+                    <td>{u.date}</td>
+                    <td>
+                      {u.quantity} {i.unit}
+                    </td>
+                    <td>{u.note || "—"}</td>
+                    <td>{u.user}</td>
+                  </tr>
+                )),
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </>
+  );
+}

@@ -1,2 +1,111 @@
-import React from 'react';import{useSelector}from'react-redux';import{Link}from'react-router-dom';import{Bar,Doughnut}from'react-chartjs-2';import{Chart as ChartJS,CategoryScale,LinearScale,BarElement,ArcElement,Tooltip,Legend}from'chart.js';import{selectDashboard,selectStock,selectAlerts,selectDueCrops,selectServiceDue,selectEquipmentStatusCount,selectWorkersPresentToday,selectWorkersAbsentToday,selectWagesPayable}from'../redux/selectors';import{money,dateText}from'../utils/formatters';import{WEATHER}from'../../config';import AttendanceChart from '../components/dashboard/AttendanceChart';ChartJS.register(CategoryScale,LinearScale,BarElement,ArcElement,Tooltip,Legend);function Card({icon,label,value,foot,tone}){return <div className="kpi-card"><div className={`kpi-icon ${tone||''}`}><i className={`bi ${icon}`}/></div><span>{label}</span><strong>{value}</strong><small>{foot}</small></div>}
-export default function Dashboard(){const stats=useSelector(selectDashboard),stock=useSelector(selectStock),alerts=useSelector(selectAlerts),due=useSelector(selectDueCrops),service=useSelector(selectServiceDue),equipment=useSelector(selectEquipmentStatusCount),present=useSelector(selectWorkersPresentToday),absent=useSelector(selectWorkersAbsentToday),wages=useSelector(selectWagesPayable(new Date().toISOString().slice(0,7))),weather=useSelector(s=>s.weather);const current=weather.data?.current,forecast=weather.data?.daily;const health=stock.map(c=>Number(c.healthScore));return <><div className="dashboard-hero"><div><span className="hero-kicker"><i className="bi bi-circle-fill"/> FARM OVERVIEW</span><h1>Good day, farmer <span>🌿</span></h1><p>Here's what's happening across your farm today.</p></div><div className="hero-date"><i className="bi bi-calendar3"/>{new Date().toLocaleDateString('en-PK',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div></div><div className="kpi-grid"><Card icon="bi-basket2" label="Total Harvest" value={`${stats.harvest.toLocaleString()} kg`} foot="Across all fields"/><Card icon="bi-bag-check" label="Quantity Sold" value={`${stats.sold.toLocaleString()} kg`} foot={`${stats.orders} active orders`} tone="blue"/><Card icon="bi-box-seam" label="Available Stock" value={`${stats.remaining.toLocaleString()} kg`} foot="Ready for sale" tone="amber"/><Card icon="bi-wallet2" label="Total Expenses" value={money(stats.expenses)} foot="Recorded spending" tone="purple"/></div><div className="dashboard-grid"><section className="dash-card weather-card"><div className="dash-head"><div><span className="eyebrow">FIELD CONDITIONS</span><h3>Live weather</h3></div><span className="live-tag">● LIVE</span></div>{weather.status==='loading'&&!current?<div className="p-4">Loading live weather...</div>:weather.status==='failed'&&!current?<div className="alert alert-warning">Weather unavailable: {weather.error}</div>:current?<><div className="weather-main"><i className="bi bi-cloud-sun"/><div><strong>{Math.round(current.temperature_2m)}°</strong><span>{WEATHER.city}, Pakistan</span></div></div><div className="weather-metrics"><div><i className="bi bi-droplet"/><strong>{current.relative_humidity_2m}%</strong><small>Humidity • {current.relative_humidity_2m<40?'Low':current.relative_humidity_2m>75?'High':'Optimal'}</small></div><div><i className="bi bi-wind"/><strong>{current.wind_speed_10m}</strong><small>Wind km/h</small></div><div><i className="bi bi-cloud-rain"/><strong>{forecast?.precipitation_probability_max?.[0]||0}%</strong><small>Rain chance</small></div></div><div className="forecast">{forecast?.time?.map((d,i)=><div key={d}><small>{new Date(`${d}T12:00:00`).toLocaleDateString('en',{weekday:'short'})}</small><i className="bi bi-cloud-sun"/><strong>{Math.round(forecast.temperature_2m_max[i])}°</strong></div>)}</div><small className="updated">Updated {weather.lastUpdated?new Date(weather.lastUpdated).toLocaleTimeString():'—'}</small></>:null}</section><section className="dash-card"><div className="dash-head"><div><span className="eyebrow">ACTION CENTER</span><h3>Alerts & attention</h3></div><span className="count-pill">{alerts.length}</span></div><div className="alerts-list">{alerts.length?alerts.slice(0,6).map((a,i)=><div className={`alert-item ${a.type}`} key={i}><i className={`bi bi-${a.type==='danger'?'exclamation-triangle':'exclamation-circle'}`}/><span>{a.text}</span></div>):<div className="empty-mini">All clear. No urgent alerts right now.</div>}</div></section><section className="dash-card"><div className="dash-head"><div><span className="eyebrow">CROP INTELLIGENCE</span><h3>Crop health</h3></div><Link to="/crops">View crops <i className="bi bi-arrow-up-right"/></Link></div><div className="crop-list">{stock.map(c=><div key={c.id}><div className="d-flex justify-content-between"><strong>{c.name}</strong><span className={`health-badge ${Number(c.healthScore)<50?'critical':Number(c.healthScore)<75?'attention':'healthy'}`}>{Number(c.healthScore)<50?'Critical':Number(c.healthScore)<75?'Needs Attention':'Healthy'}</span></div><small>{c.field} · {c.available} kg available</small><div className="progress"><div className="progress-bar" style={{width:`${c.healthScore}%`,background:Number(c.healthScore)<50?'#df6a58':Number(c.healthScore)<75?'#e6a94b':'#2e9d72'}}/></div></div>)}</div></section><section className="dash-card"><div className="dash-head"><div><span className="eyebrow">UPCOMING</span><h3>Cutting schedule</h3></div><Link to="/crops">Full schedule <i className="bi bi-arrow-up-right"/></Link></div>{due.length?due.map(c=><div className="schedule-row" key={c.id}><div className="date-tile"><strong>{new Date(`${c.cuttingDate}T12:00:00`).getDate()}</strong><small>{new Date(`${c.cuttingDate}T12:00:00`).toLocaleDateString('en',{month:'short'})}</small></div><div><strong>{c.name}</strong><small>{c.field}</small></div><span className={c.daysRemaining<0?'text-danger':''}>{c.daysRemaining<0?'Overdue':c.daysRemaining===0?'Today':`${c.daysRemaining} days`}</span></div>):<div className="empty-mini">No crops due in the next 7 days.</div>}</section><section className="dash-card"><div className="dash-head"><div><span className="eyebrow">YOUR TEAM</span><h3>Workforce today</h3></div><Link to="/workers">Manage team <i className="bi bi-arrow-up-right"/></Link></div><div className="metric-row"><div><strong>{stats.workers}</strong><span>Total workers</span></div><div><strong>{present}</strong><span>Present</span></div><div><strong>{absent}</strong><span>Absent</span></div></div><div className="wage-strip">Wages payable this month <strong>{money(wages.reduce((n,w)=>n+w.wage,0))}</strong></div></section><section className="dash-card"><div className="dash-head"><div><span className="eyebrow">FLEET STATUS</span><h3>Equipment</h3></div><Link to="/equipment">Manage fleet <i className="bi bi-arrow-up-right"/></Link></div><div className="metric-row"><div><strong>{equipment.Active}</strong><span>Active</span></div><div><strong>{equipment['Under Repair']}</strong><span>Under repair</span></div><div><strong>{equipment.Idle}</strong><span>Idle</span></div></div><div className="service-list">{service.slice(0,3).map(e=><div key={e.id}><span>{e.name}</span><strong className={e.daysRemaining<0?'text-danger':''}>{e.daysRemaining<0?'Overdue':`${e.daysRemaining}d left`}</strong></div>)}</div></section><section className="dash-card chart-card"><div className="dash-head"><div><span className="eyebrow">ANALYTICS</span><h3>Harvest vs sales</h3></div></div><Bar data={{labels:stock.map(c=>c.name),datasets:[{label:'Harvest kg',data:stock.map(c=>c.harvestQty),backgroundColor:'#b6dcc7',borderRadius:6},{label:'Sold kg',data:stock.map(c=>c.sold),backgroundColor:'#287d5f',borderRadius:6}]}} options={{responsive:true,maintainAspectRatio:false}}/></section><section className="dash-card chart-card"><div className="dash-head"><div><span className="eyebrow">DISTRIBUTION</span><h3>Health mix</h3></div></div><div className="donut-wrap"><Doughnut data={{labels:['Healthy','Needs Attention','Critical'],datasets:[{data:[health.filter(x=>x>=75).length,health.filter(x=>x>=50&&x<75).length,health.filter(x=>x<50).length],backgroundColor:['#2e9d72','#e7b354','#df6a58'],borderWidth:0}]}} options={{maintainAspectRatio:false}}/></div></section><AttendanceChart/></div></>}
+import React from "react";
+import { useSelector } from "react-redux";
+import WeatherCard from "../components/dashboard/WeatherCard";
+import AlertsPanel from "../components/dashboard/AlertsPanel";
+import CropHealthList from "../components/dashboard/CropHealthList";
+import CuttingSchedule from "../components/dashboard/CuttingSchedule";
+import WorkforceCard from "../components/dashboard/WorkforceCard";
+import EquipmentStatusCard from "../components/dashboard/EquipmentStatusCard";
+import HarvestChart from "../components/dashboard/HarvestChart";
+import CropHealthChart from "../components/dashboard/CropHealthChart";
+import AttendanceChart from "../components/dashboard/AttendanceChart";
+import StatCard from "../components/common/StatCard";
+import {
+  selectDashboard,
+  selectStock,
+  selectAlerts,
+  selectDueCrops,
+  selectServiceDue,
+  selectEquipmentStatusCount,
+  selectWorkersPresentToday,
+  selectWorkersAbsentToday,
+  selectWagesPayable,
+  selectHealthDistribution,
+} from "../redux/selectors";
+import { money } from "../utils/formatters";
+export default function Dashboard() {
+  const stats = useSelector(selectDashboard),
+    stock = useSelector(selectStock),
+    alerts = useSelector(selectAlerts),
+    due = useSelector(selectDueCrops),
+    service = useSelector(selectServiceDue),
+    equipment = useSelector(selectEquipmentStatusCount),
+    present = useSelector(selectWorkersPresentToday),
+    absent = useSelector(selectWorkersAbsentToday),
+    wages = useSelector(
+      selectWagesPayable(new Date().toISOString().slice(0, 7)),
+    ),
+    weather = useSelector((s) => s.weather);
+  const current = weather.data?.current,
+    forecast = weather.data?.daily;
+  const health = useSelector(selectHealthDistribution);
+  return (
+    <>
+      <div className="dashboard-hero">
+        <div>
+          <span className="hero-kicker">
+            <i className="bi bi-circle-fill" /> FARM OVERVIEW
+          </span>
+          <h1>
+            Good day, farmer <span>🌿</span>
+          </h1>
+          <p>Here's what's happening across your farm today.</p>
+        </div>
+        <div className="hero-date">
+          <i className="bi bi-calendar3" />
+          {new Date().toLocaleDateString("en-PK", {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          })}
+        </div>
+      </div>
+      <div className="kpi-grid">
+        <StatCard
+          icon="bi-basket2"
+          label="Total Harvest"
+          value={`${stats.harvest.toLocaleString()} kg`}
+          foot="Across all fields"
+        />
+        <StatCard
+          icon="bi-bag-check"
+          label="Quantity Sold"
+          value={`${stats.sold.toLocaleString()} kg`}
+          foot={`${stats.orders} active orders`}
+          tone="blue"
+        />
+        <StatCard
+          icon="bi-box-seam"
+          label="Available Stock"
+          value={`${stats.remaining.toLocaleString()} kg`}
+          foot="Ready for sale"
+          tone="amber"
+        />
+        <StatCard
+          icon="bi-wallet2"
+          label="Total Expenses"
+          value={money(stats.expenses)}
+          foot="Recorded spending"
+          tone="purple"
+        />
+      </div>
+      <div className="dashboard-grid">
+        <WeatherCard weather={weather} current={current} forecast={forecast} />
+        <AlertsPanel alerts={alerts} />
+        <CropHealthList stock={stock} />
+        <CuttingSchedule due={due} />
+        <WorkforceCard
+          stats={stats}
+          present={present}
+          absent={absent}
+          wages={wages}
+        />
+        <EquipmentStatusCard equipment={equipment} service={service} />
+        <HarvestChart stock={stock} />
+        <CropHealthChart health={health} />
+        <AttendanceChart />
+      </div>
+    </>
+  );
+}

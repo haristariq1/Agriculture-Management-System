@@ -1,1 +1,75 @@
-import React,{useState} from 'react';import{useDispatch,useSelector}from'react-redux';import{selectWagesPayable}from'../../redux/selectors';import{PAYWAGES}from'../../redux/actions/expenses';import{SHOWTOAST}from'../../redux/actions/ui';import{money}from'../../utils/formatters';export default function WageSummary(){const[month,setMonth]=useState(new Date().toISOString().slice(0,7)),rows=useSelector(selectWagesPayable(month)),expenses=useSelector(s=>s.expenses.expenses),dispatch=useDispatch();return <section className="section-card"><div className="section-heading"><div><span className="eyebrow">PAYROLL</span><h2>Monthly wages</h2><p>Present days plus half of half-days, multiplied by daily wage.</p></div><input type="month" className="form-control month-input" value={month} onChange={e=>setMonth(e.target.value)}/></div><div className="table-responsive"><table className="table"><thead><tr><th>Worker</th><th>Daily wage</th><th>Payable</th><th>Action</th></tr></thead><tbody>{rows.map(w=><tr key={w.id}><td>{w.fullName}</td><td>{money(w.dailyWage)}</td><td><strong>{money(w.wage)}</strong></td><td><button className="btn btn-sm btn-brand" disabled={!w.wage||expenses.some(e=>e.id===`wage-${w.id}-${month}`)} onClick={async()=>{try{await dispatch(PAYWAGES(w,month,w.wage));dispatch(SHOWTOAST('Wages paid and Labour expense recorded'))}catch(e){dispatch(SHOWTOAST(e.message,'danger'))}}}>{expenses.some(e=>e.id===`wage-${w.id}-${month}`)?'Paid':'Pay wages'}</button></td></tr>)}</tbody></table></div></section>}
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { selectWagesPayable } from "../../redux/selectors";
+import { PAYWAGES } from "../../redux/actions/expenses";
+import { SHOWTOAST } from "../../redux/actions/ui";
+import { money } from "../../utils/formatters";
+export default function WageSummary() {
+  const [month, setMonth] = useState(new Date().toISOString().slice(0, 7)),
+    rows = useSelector(selectWagesPayable(month)),
+    expenses = useSelector((s) => s.expenses.expenses),
+    dispatch = useDispatch();
+  return (
+    <section className="section-card">
+      <div className="section-heading">
+        <div>
+          <span className="eyebrow">PAYROLL</span>
+          <h2>Monthly wages</h2>
+          <p>Present days plus half of half-days, multiplied by daily wage.</p>
+        </div>
+        <input
+          type="month"
+          className="form-control month-input"
+          value={month}
+          onChange={(e) => setMonth(e.target.value)}
+        />
+      </div>
+      <div className="table-responsive">
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Worker</th>
+              <th>Daily wage</th>
+              <th>Payable</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((w) => (
+              <tr key={w.id}>
+                <td>{w.fullName}</td>
+                <td>{money(w.dailyWage)}</td>
+                <td>
+                  <strong>{money(w.wage)}</strong>
+                </td>
+                <td>
+                  <button
+                    className="btn btn-sm btn-brand"
+                    disabled={
+                      !w.wage ||
+                      expenses.some((e) => e.id === `wage-${w.id}-${month}`)
+                    }
+                    onClick={async () => {
+                      try {
+                        await dispatch(PAYWAGES(w, month, w.wage));
+                        dispatch(
+                          SHOWTOAST("Wages paid and Labour expense recorded"),
+                        );
+                      } catch (e) {
+                        dispatch(SHOWTOAST(e.message, "danger"));
+                      }
+                    }}
+                  >
+                    {expenses.some((e) => e.id === `wage-${w.id}-${month}`)
+                      ? "Paid"
+                      : "Pay wages"}
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}

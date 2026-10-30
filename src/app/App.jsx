@@ -1,3 +1,92 @@
-import React,{useEffect} from 'react';import ProtectedRoute from './auth/ProtectedRoute';import {Routes,Route,NavLink,Navigate,useNavigate} from 'react-router-dom';import {useDispatch,useSelector} from 'react-redux';import * as actions from './redux/actions';import {GETACTIVITY} from './redux/actions/activity';import {FETCHWEATHER} from './redux/actions/weather';import {LOGOUT} from './redux/actions/users';import {HIDETOAST,TOGGLESIDEBAR,TOGGLETHEME} from './redux/actions/ui';import {routes} from './routes';import Dashboard from './views/Dashboard';import Workers from './views/Workers';import Equipment from './views/Equipment';import Reports from './views/Reports';import Inventory from './views/Inventory';import Crops from './views/Crops';import HarvestOrders from './views/HarvestOrders';import Buyers from './views/Buyers';import Tasks from './views/Tasks';import Expenses from './views/Expenses';import NotFound from './views/NotFound';import Login from './views/Login';import {WEATHER} from '../config';
-function Shell(){const dispatch=useDispatch(),navigate=useNavigate(),user=useSelector(s=>s.user.user),ui=useSelector(s=>s.ui),alerts=useSelector(s=>s.activity.logs.length);useEffect(()=>{['GETCROPS','GETORDERS','GETBUYERS','GETTASKS','GETEXPENSES','GETINVENTORY','GETWORKERS','GETATTENDANCE','GETEQUIPMENT','GETMAINTENANCE'].forEach(name=>dispatch(actions[name]() ).catch(()=>{}));dispatch(GETACTIVITY());dispatch(FETCHWEATHER());const id=setInterval(()=>dispatch(FETCHWEATHER()),WEATHER.refreshMs);return()=>clearInterval(id)},[dispatch]);useEffect(()=>{if(ui.toast){const id=setTimeout(()=>dispatch(HIDETOAST()),3500);return()=>clearTimeout(id)}},[ui.toast,dispatch]);return <div className={`app-shell ${ui.theme==='dark'?'dark':''}`}><aside className={`sidebar ${ui.sidebarOpen?'open':''}`}><div className="brand"><div className="brand-mark"><i className="bi bi-flower1"/></div><div><strong>Verdant</strong><small>FARM OPERATIONS</small></div></div><div className="sidebar-label">WORKSPACE</div><nav>{routes.map(([path,label,icon])=><NavLink key={path} to={path} end={path==='/'} onClick={()=>ui.sidebarOpen&&dispatch(TOGGLESIDEBAR())}><i className={`bi ${icon}`}/>{label}</NavLink>)}</nav><div className="sidebar-bottom"><div className="avatar">{user.username[0].toUpperCase()}</div><div><strong>{user.username}</strong><small>{user.role}</small></div></div></aside><main className="main-area"><header className="topbar"><button className="mobile-toggle" onClick={()=>dispatch(TOGGLESIDEBAR())}><i className="bi bi-list"/></button><div className="topbar-location"><i className="bi bi-geo-alt-fill"/> {WEATHER.city}, Pakistan <span>•</span> {new Date().toLocaleDateString('en-PK',{weekday:'long',day:'numeric',month:'long'})}</div><div className="topbar-actions"><button title="Toggle theme" onClick={()=>dispatch(TOGGLETHEME())}><i className={`bi bi-${ui.theme==='dark'?'sun':'moon'}`}/></button><button title="Reports" onClick={()=>navigate('/reports')}><i className="bi bi-bell"/><span className="bell-dot"/></button><div className="user-chip"><span>{user.username[0].toUpperCase()}</span>{user.role}</div><button title="Logout" onClick={async()=>{await dispatch(LOGOUT());navigate('/login')}}><i className="bi bi-box-arrow-right"/></button></div></header><div className="content"><Routes><Route path="/" element={<Dashboard/>}/><Route path="/crops" element={<Crops/>}/><Route path="/harvest-orders" element={<HarvestOrders/>}/><Route path="/buyers" element={<Buyers/>}/><Route path="/tasks" element={<Tasks/>}/><Route path="/expenses" element={<Expenses/>}/><Route path="/inventory" element={<Inventory/>}/><Route path="/workers" element={<Workers/>}/><Route path="/equipment" element={<Equipment/>}/><Route path="/reports" element={<Reports/>}/><Route path="*" element={<NotFound/>}/></Routes></div></main>{ui.toast&&<div className={`app-toast alert alert-${ui.toast.variant}`}>{ui.toast.message}<button className="btn-close ms-3" onClick={()=>dispatch(HIDETOAST())}/></div>}</div>}
-export default function App(){return <Routes><Route path="/login" element={<Login/>}/><Route path="/*" element={<ProtectedRoute><Shell/></ProtectedRoute>}/></Routes>}
+import React, { useEffect } from "react";
+import ProtectedRoute from "./auth/ProtectedRoute";
+import { Routes, Route } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import * as actions from "./redux/actions";
+import { GETACTIVITY } from "./redux/actions/activity";
+import { FETCHWEATHER } from "./redux/actions/weather";
+
+import { HIDETOAST } from "./redux/actions/ui";
+import Sidebar from "./components/common/Sidebar";
+import Navbar from "./components/common/Navbar";
+import Toast from "./components/common/Toast";
+import Dashboard from "./views/Dashboard";
+import Workers from "./views/Workers";
+import Equipment from "./views/Equipment";
+import Reports from "./views/Reports";
+import Inventory from "./views/Inventory";
+import Crops from "./views/Crops";
+import HarvestOrders from "./views/HarvestOrders";
+import Buyers from "./views/Buyers";
+import Tasks from "./views/Tasks";
+import Expenses from "./views/Expenses";
+import NotFound from "./views/NotFound";
+import Login from "./views/Login";
+import { WEATHER } from "../config";
+function Shell() {
+  const dispatch = useDispatch();
+  const ui = useSelector((s) => s.ui);
+  useEffect(() => {
+    [
+      "GETCROPS",
+      "GETORDERS",
+      "GETBUYERS",
+      "GETTASKS",
+      "GETEXPENSES",
+      "GETINVENTORY",
+      "GETWORKERS",
+      "GETATTENDANCE",
+      "GETEQUIPMENT",
+      "GETMAINTENANCE",
+    ].forEach((name) => dispatch(actions[name]()).catch(() => {}));
+    dispatch(GETACTIVITY());
+    dispatch(FETCHWEATHER());
+    const id = setInterval(() => dispatch(FETCHWEATHER()), WEATHER.refreshMs);
+    return () => clearInterval(id);
+  }, [dispatch]);
+  useEffect(() => {
+    if (ui.toast) {
+      const id = setTimeout(() => dispatch(HIDETOAST()), 3500);
+      return () => clearTimeout(id);
+    }
+  }, [ui.toast, dispatch]);
+  return (
+    <div className={`app-shell ${ui.theme === "dark" ? "dark" : ""}`}>
+      <Sidebar />
+      <main className="main-area">
+        <Navbar />
+        <div className="content">
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/crops" element={<Crops />} />
+            <Route path="/harvest-orders" element={<HarvestOrders />} />
+            <Route path="/buyers" element={<Buyers />} />
+            <Route path="/tasks" element={<Tasks />} />
+            <Route path="/expenses" element={<Expenses />} />
+            <Route path="/inventory" element={<Inventory />} />
+            <Route path="/workers" element={<Workers />} />
+            <Route path="/equipment" element={<Equipment />} />
+            <Route path="/reports" element={<Reports />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </div>
+      </main>
+      <Toast />
+    </div>
+  );
+}
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route
+        path="/*"
+        element={
+          <ProtectedRoute>
+            <Shell />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
+  );
+}

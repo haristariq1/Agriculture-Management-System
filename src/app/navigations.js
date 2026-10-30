@@ -1,1 +1,1 @@
-export {routes as navigations} from './routes';
+export { routes as navigations } from "./routes";

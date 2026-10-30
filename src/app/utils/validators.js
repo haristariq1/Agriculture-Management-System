@@ -1,10 +1,16 @@
-export const digits = value => String(value || '').replace(/\D/g, '');
-export const formatCnic = value => { const d=digits(value).slice(0,13); return [d.slice(0,5),d.slice(5,12),d.slice(12)].filter(Boolean).join('-'); };
-export const validateName = value => /^[A-Za-z ]{3,}$/.test(String(value||'').trim());
-export const validateCnic = value => digits(value).length === 13;
-export const validatePhone = value => digits(value).length === 11;
-export const validateWage = value => Number(value)>0;
-export const validateQuantity = value => Number(value)>0;
-export const validateServiceInterval = value => Number.isInteger(Number(value)) && Number(value)>0;
-export const validateLogin = (u,p) => Boolean(u?.trim() && p?.trim());
-export const validateImage = file => ['image/jpeg','image/png'].includes(file?.type) && file.size <= 1048576;
+export const digits = (value) => String(value || "").replace(/\D/g, "");
+export const formatCnic = (value) => {
+  const d = digits(value).slice(0, 13);
+  return [d.slice(0, 5), d.slice(5, 12), d.slice(12)].filter(Boolean).join("-");
+};
+export const validateName = (value) =>
+  /^[A-Za-z ]{3,}$/.test(String(value || "").trim());
+export const validateCnic = (value) => digits(value).length === 13;
+export const validatePhone = (value) => digits(value).length === 11;
+export const validateWage = (value) => Number(value) > 0;
+export const validateQuantity = (value) => Number(value) > 0;
+export const validateServiceInterval = (value) =>
+  Number.isInteger(Number(value)) && Number(value) > 0;
+export const validateLogin = (u, p) => Boolean(u?.trim() && p?.trim());
+export const validateImage = (file) =>
+  ["image/jpeg", "image/png"].includes(file?.type) && file.size <= 1048576;

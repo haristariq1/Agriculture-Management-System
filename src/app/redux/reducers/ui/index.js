@@ -1,1 +1,17 @@
-export const uiReducer=(state={theme:'light',toast:null,sidebarOpen:false},action)=>{switch(action.type){case 'ui/toggle_theme':return {...state,theme:state.theme==='light'?'dark':'light'};case 'ui/show_toast':return {...state,toast:action.payload};case 'ui/hide_toast':return {...state,toast:null};case 'ui/toggle_sidebar':return {...state,sidebarOpen:!state.sidebarOpen};default:return state}};
+export const uiReducer = (
+  state = { theme: "light", toast: null, sidebarOpen: false },
+  action,
+) => {
+  switch (action.type) {
+    case "ui/toggle_theme":
+      return { ...state, theme: state.theme === "light" ? "dark" : "light" };
+    case "ui/show_toast":
+      return { ...state, toast: action.payload };
+    case "ui/hide_toast":
+      return { ...state, toast: null };
+    case "ui/toggle_sidebar":
+      return { ...state, sidebarOpen: !state.sidebarOpen };
+    default:
+      return state;
+  }
+};

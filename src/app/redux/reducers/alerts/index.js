@@ -1,1 +1,1 @@
-export const alertsReducer=(state={list:[]})=>state;
+export const alertsReducer = (state = { list: [] }) => state;

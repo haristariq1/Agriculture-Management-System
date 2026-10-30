@@ -37,7 +37,7 @@ These credentials are demo data in a client-only application, not secure authent
 
 ### Known limitations
 
-The delivered interface uses a reusable CRUD component rather than every component file named in sections 8–9 of the brief. Several exact component file names are incomplete; the shared CRUD component supplies those flows. Demo authentication is necessarily client-side and cannot resist a user who edits localStorage or JavaScript. GitHub and Slack submission are not part of this repository and have not been performed.
+The data entry and record tables share a reusable CRUD component rather than every form and table file named in sections 8–9 of the brief. Several exact component file names are incomplete; the shared CRUD component supplies those flows. Demo authentication is necessarily client-side and cannot resist a user who edits localStorage or JavaScript. GitHub and Slack submission are not part of this repository and have not been performed.
 
 ## Screenshot
 
@@ -74,7 +74,7 @@ Weather coordinates, display city and refresh interval are in `src/config.js`. O
 
 ## Testing
 
-`npm test` exercises 20 critical calculations, validations, storage cases and module CRUD flows. `npm run lint` checks source syntax and undefined names. `npm run build` produces `dist/`. A browser smoke test covered Admin and Manager login, live weather success, crop add/delete and confirmation, reload persistence, Manager equipment restrictions and all route rendering. Other interactive flows were not fully verified in a browser.
+`npm test` exercises 21 critical calculations, validations, storage cases and module CRUD flows. `npm run lint` checks source syntax and undefined names. `npm run build` produces `dist/`. `npm audit --omit=dev` found no production dependency advisories at the time of verification. A browser smoke test covered Admin and Manager login, live weather success, crop add/delete and confirmation, reload persistence, Manager equipment restrictions and all route rendering. Other interactive flows were not fully verified in a browser.
 
 ## Assignment
 

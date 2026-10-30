@@ -1,1 +1,3 @@
-export function exportPdf(){window.print()}
+export function exportPdf() {
+  window.print();
+}
