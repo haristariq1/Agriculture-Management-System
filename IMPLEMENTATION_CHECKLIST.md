@@ -21,7 +21,7 @@ Source: `UDevs_Batch6_Agriculture_Management_System_Extended_v2.pdf` (14 pages).
 | 15 | 2,11 | Crop health filter and date/quantity sorting | Complete | `CrudModule` controls |
 | 16 | 2,11 | Orders add/view/edit/delete and status | Complete | CRUD API tests, orders page |
 | 17 | 2,11 | Orders-over-time chart | Complete | `OrdersTrendChart` |
-| 18 | 2,11 | Harvest-versus-sales chart | Partial | Chart compares crops; PDF says over time in one passage |
+| 18 | 2,11 | Harvest-versus-sales chart | Complete | Crop comparison plus `HarvestTrendChart` grouped by date |
 | 19 | 2,11 | Buyer add/view/edit/delete and photo detail | Complete | API CRUD tests, buyer table/detail modal |
 | 20 | 2,11 | Buyer name validation, CNIC formatting and duplicates | Complete | Validator and API tests |
 | 21 | 2,11 | JPG/PNG photo ≤1 MB, preview and Base64 storage | Complete | `ImageUpload`, `validateImage`, API validation; browser upload not exercised |

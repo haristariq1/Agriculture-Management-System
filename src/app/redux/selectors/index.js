@@ -135,6 +135,19 @@ export const selectMonthlyProfitByCrop = (month) => createSelector(
     return { crop: c.name, revenue, expense: cost, profit: revenue - cost };
   }).filter((row) => row.revenue || row.expense),
 );
+export const selectHarvestSalesTrend = createSelector([selectCrops, selectBuyers], (crops, buyers) => {
+  const dates = [...new Set([
+    ...crops.map((crop) => crop.cuttingDate),
+    ...buyers.map((buyer) => buyer.date),
+  ].filter(Boolean))].sort();
+  return {
+    dates,
+    harvest: dates.map((date) => crops.filter((crop) => crop.cuttingDate === date)
+      .reduce((total, crop) => total + Number(crop.harvestQty), 0)),
+    sales: dates.map((date) => buyers.filter((buyer) => buyer.date === date)
+      .reduce((total, buyer) => total + Number(buyer.quantity), 0)),
+  };
+});
 export const selectAttendanceTrend = createSelector([selectAttendance], (records) => {
   const days = Array.from({ length: 7 }, (_, i) => {
     const day = new Date();

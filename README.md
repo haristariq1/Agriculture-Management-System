@@ -30,7 +30,7 @@ These credentials are demo data in a client-only application, not secure authent
 - [x] Daily attendance duplicate prevention and monthly wage calculation
 - [x] Wage and maintenance expenses with stable linked IDs to prevent duplication
 - [x] Service due calculation, workforce/equipment dashboard indicators and alerts
-- [x] Search, status filter, amount sort, CSV export and print/PDF from reports
+- [x] Search, status filter, amount sort, harvest/sales time chart, CSV export and print/PDF from reports
 - [x] Activity log with user, action, entity and timestamp
 - [x] Responsive sidebar, tables, forms, confirmation modal and toast
 - [x] Unit tests for validation, stock limit, attendance, wages and linked expenses

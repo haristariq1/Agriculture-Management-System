@@ -7,7 +7,7 @@ import {
   validateQuantity,
 } from "../validators";
 import { addDays } from "../formatters";
-import { wageFor, selectStock, selectServiceDue, selectMonthlyProfitByCrop } from "../../redux/selectors";
+import { wageFor, selectStock, selectServiceDue, selectMonthlyProfitByCrop, selectHarvestSalesTrend } from "../../redux/selectors";
 import { KEYS, mutate, payWage, readList } from "../../redux/api";
 const memory = new Map();
 beforeEach(() => {
@@ -29,6 +29,7 @@ describe("business rules", () => {
     expect(selectStock(state)[0].available).toBe(13);
     expect(selectServiceDue(state)[0].nextServiceDate).toBe("2026-11-06");
     expect(selectMonthlyProfitByCrop("2026-10")(state)[0].profit).toBe(500);
+    expect(selectHarvestSalesTrend(state)).toEqual({ dates: ["2026-10-30"], harvest: [0], sales: [7] });
   });
   it("formats CNIC and validates worker inputs", () => {
     expect(formatCnic("1234512345671")).toBe("12345-1234567-1");
