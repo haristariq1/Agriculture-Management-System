@@ -6,6 +6,7 @@ Source: U Devs Batch 6 Agriculture Management System Extended v2, all 14 pages r
 | --- | --- |
 | React, Redux Toolkit, Redux Thunk, Router, Bootstrap, Axios, Chart.js | Implemented |
 | Action/API/reducer module folders and REQUEST/SUCCESS/FAILURE | Implemented |
+| Users action/API/reducer operations | Implemented; no user page required by brief |
 | Redux selectors, persistence, activity middleware, DevTools | Implemented |
 | Dashboard weather, humidity, forecast, alerts and analytics | Implemented |
 | Crop, order, buyer, task, expense, inventory CRUD | Implemented |

@@ -1,34 +1,81 @@
 import * as api from "../../api/users";
-import { REQUEST, SUCCESS, FAILURE } from "../utilities";
-export const LOGIN = (username, password) => async (dispatch) => {
-  dispatch(REQUEST("user/login_request"));
-  try {
-    const r = await api.login(username, password);
-    if (!r.data.succeeded) throw Error(r.data.message);
-    dispatch(SUCCESS("user/login_success", r.data.data));
-    return r.data.data;
-  } catch (e) {
-    dispatch(FAILURE("user/login_failure", e.message));
-    throw e;
-  }
-};
-export const LOGOUT = () => async (dispatch) => {
-  dispatch(REQUEST("user/logout_request"));
-  await api.logout();
-  dispatch(SUCCESS("user/logout_success", null));
-};
-export const GETALLUSERS = () => async (dispatch) => {
-  dispatch(REQUEST("user/getall_request"));
-  const r = await api.getAllUsers();
-  dispatch(SUCCESS("user/getall_success", r.data.data));
-};
-export const GETUSER = (username) => async (dispatch) => {
-  dispatch(REQUEST("user/get_request"));
-  const r = await api.getUser(username);
-  dispatch(SUCCESS("user/get_success", r.data.data));
-};
-export const CREATEUSER = () => async (dispatch) => {
-  dispatch(FAILURE("user/create_failure", "Demo users are fixed"));
-};
-export const UPDATEUSER = CREATEUSER;
-export const REMOVEUSER = CREATEUSER;
+import { REQUEST, SUCCESS, FAILURE, USER_REQUEST as T } from "../utilities";
+const run =
+  (request, success, failureType, call, moveToNext, failure) =>
+  async (dispatch) => {
+    dispatch(REQUEST(request));
+    try {
+      const response = await call();
+      if (!response.data.succeeded) throw Error(response.data.message);
+      dispatch(SUCCESS(success, response.data.data));
+      moveToNext?.(response.data.data);
+      return response.data.data;
+    } catch (error) {
+      dispatch(FAILURE(failureType, error.message));
+      failure?.(error.message);
+      throw error;
+    }
+  };
+export const LOGIN = (username, password, moveToNext, failure) =>
+  run(
+    T.LOGIN_REQUEST,
+    T.LOGIN_SUCCESS,
+    T.LOGIN_FAILURE,
+    () => api.login(username, password),
+    moveToNext,
+    failure,
+  );
+export const LOGOUT = (moveToNext, failure) =>
+  run(
+    T.LOGOUT_REQUEST,
+    T.LOGOUT_SUCCESS,
+    T.LOGOUT_FAILURE,
+    api.logout,
+    moveToNext,
+    failure,
+  );
+export const GETALLUSERS = (moveToNext, failure) =>
+  run(
+    T.GET_ALL_USERS_REQUEST,
+    T.GET_ALL_USERS_SUCCESS,
+    T.GET_ALL_USERS_FAILURE,
+    api.getAllUsers,
+    moveToNext,
+    failure,
+  );
+export const GETUSER = (id, moveToNext, failure) =>
+  run(
+    T.GET_USER_REQUEST,
+    T.GET_USER_SUCCESS,
+    T.GET_USER_FAILURE,
+    () => api.getUser(id),
+    moveToNext,
+    failure,
+  );
+export const CREATEUSER = (data, moveToNext, failure) => (dispatch, getState) =>
+  run(
+    T.CREATE_REQUEST,
+    T.CREATE_SUCCESS,
+    T.CREATE_FAILURE,
+    () => api.create(data, getState().user.user?.role),
+    moveToNext,
+    failure,
+  )(dispatch);
+export const UPDATEUSER = (data, moveToNext, failure) => (dispatch, getState) =>
+  run(
+    T.UPDATE_USER_REQUEST,
+    T.UPDATE_USER_SUCCESS,
+    T.UPDATE_USER_FAILURE,
+    () => api.updateUser(data, getState().user.user?.role),
+    moveToNext,
+    failure,
+  )(dispatch);
+export const REMOVEUSER = (id, moveToNext, failure) => (dispatch, getState) =>
+  run(
+    T.REMOVE_USER_REQUEST,
+    T.REMOVE_USER_SUCCESS,
+    T.REMOVE_USER_FAILURE,
+    () => api.removeUser(id, getState().user.user?.role),
+    moveToNext,
+    failure,
+  )(dispatch);

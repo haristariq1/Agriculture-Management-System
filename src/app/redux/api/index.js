@@ -22,6 +22,7 @@ export const KEYS = Object.fromEntries(
     "maintenance",
     "activity",
     "session",
+    "users",
   ].map((k) => [k, `agri_${k}`]),
 );
 export const ok = (data, message = "OK") => ({

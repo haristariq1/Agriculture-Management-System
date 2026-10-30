@@ -8,3 +8,7 @@ export * from "./workers";
 export * from "./attendance";
 export * from "./equipment";
 export * from "./maintenance";
+export * from "./users";
+export * from "./weather";
+export * from "./activity";
+export * from "./ui";

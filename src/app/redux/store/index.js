@@ -8,15 +8,12 @@ try {
   session = JSON.parse(localStorage.getItem("agri_session"));
   theme = localStorage.getItem("agri_theme") || "light";
 } catch {}
+const initialState = rootReducer(undefined, { type: "@@INIT" });
 export const store = configureStore({
   reducer: rootReducer,
   preloadedState: {
-    user: {
-      user: session,
-      allUsers: [],
-      loginLoading: false,
-      loginError: null,
-    },
+    ...initialState,
+    user: { ...initialState.user, user: session },
     ui: { theme, toast: null, sidebarOpen: false },
   },
   middleware: (getDefault) =>

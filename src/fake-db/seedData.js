@@ -100,4 +100,13 @@ export const seedData = {
   ],
   maintenance: [],
   activity: [],
+  users: [
+    { id: "u-admin", username: "admin", password: "Admin@123", role: "Admin" },
+    {
+      id: "u-manager",
+      username: "manager",
+      password: "Manager@123",
+      role: "Manager",
+    },
+  ],
 };

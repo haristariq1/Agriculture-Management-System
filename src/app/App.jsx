@@ -28,6 +28,7 @@ function Shell() {
   const ui = useSelector((s) => s.ui);
   useEffect(() => {
     [
+      "GETALLUSERS",
       "GETCROPS",
       "GETORDERS",
       "GETBUYERS",

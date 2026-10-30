@@ -154,6 +154,9 @@ export const USER_REQUEST = {
   GET_ALL_USERS_REQUEST: "user/getall_request",
   GET_ALL_USERS_SUCCESS: "user/getall_success",
   GET_ALL_USERS_FAILURE: "user/getall_failure",
+  GET_USER_REQUEST: "user/get_request",
+  GET_USER_SUCCESS: "user/get_success",
+  GET_USER_FAILURE: "user/get_failure",
   CREATE_REQUEST: "user/create_request",
   CREATE_SUCCESS: "user/create_success",
   CREATE_FAILURE: "user/create_failure",
@@ -180,3 +183,19 @@ export const ACTIVITY_REQUEST = {
   CLEAR_SUCCESS: "activity/clear_success",
   CLEAR_FAILURE: "activity/clear_failure",
 };
+export const UI_ACTION = {
+  TOGGLE_THEME: "ui/toggle_theme",
+  SHOW_TOAST: "ui/show_toast",
+  HIDE_TOAST: "ui/hide_toast",
+  TOGGLE_SIDEBAR: "ui/toggle_sidebar",
+};
+for (const [types, singular, plural] of [
+  [CROP_REQUEST, "CROP", "CROPS"],
+  [ORDER_REQUEST, "ORDER", "ORDERS"],
+  [BUYER_REQUEST, "BUYER", "BUYERS"],
+  [TASK_REQUEST, "TASK", "TASKS"],
+  [WORKER_REQUEST, "WORKER", "WORKERS"],
+]) {
+  for (const phase of ["REQUEST", "SUCCESS", "FAILURE"])
+    types[`GET_${plural}_${phase}`] = types[`GET_${singular}_${phase}`];
+}

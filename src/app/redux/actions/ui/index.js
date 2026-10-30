@@ -1,7 +1,8 @@
-export const TOGGLETHEME = () => ({ type: "ui/toggle_theme" });
+import { UI_ACTION as T } from "../utilities";
+export const TOGGLETHEME = () => ({ type: T.TOGGLE_THEME });
 export const SHOWTOAST = (message, variant = "success") => ({
-  type: "ui/show_toast",
+  type: T.SHOW_TOAST,
   payload: { message, variant },
 });
-export const HIDETOAST = () => ({ type: "ui/hide_toast" });
-export const TOGGLESIDEBAR = () => ({ type: "ui/toggle_sidebar" });
+export const HIDETOAST = () => ({ type: T.HIDE_TOAST });
+export const TOGGLESIDEBAR = () => ({ type: T.TOGGLE_SIDEBAR });
