@@ -43,6 +43,8 @@ The named form and table components use shared `RecordForm` and `RecordTable` ba
 
 ![Dashboard](dashboard-screenshot.png)
 
+![Final audit dashboard](final-audit-dashboard.jpg)
+
 ## Architecture
 
 ```
