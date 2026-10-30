@@ -41,9 +41,8 @@ The named form and table components use shared `RecordForm` and `RecordTable` ba
 
 ## Screenshot
 
-![Dashboard](dashboard-screenshot.png)
+![Dashboard](dashboard-screenshot.jpg)
 
-![Final audit dashboard](final-audit-dashboard.jpg)
 
 ## Architecture
 
@@ -72,7 +71,7 @@ Each data module has `src/app/redux/actions/<module>/index.js`, `api/<module>/in
 
 ## Configuration
 
-Weather coordinates, display city and refresh interval are read centrally by `src/config.js`. Defaults work without configuration. To customize, copy `.env.example` to `.env` and edit the values. `.env` is ignored by Git. Open-Meteo is the only live network dependency. The weather panel retains an error state if offline.
+Weather coordinates, display city and refresh interval are read centrally by `src/config.js`. Defaults work without configuration. To customize, copy to `.env` and edit the values. `.env` is ignored by Git. Open-Meteo is the only live network dependency. The weather panel retains an error state if offline.
 
 ## Testing
 
