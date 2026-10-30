@@ -1,5 +1,5 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { addDays, dayDiff } from "../../utils/formatters";
+import { addDays, dayDiff, localDate } from "../../utils/formatters";
 export const selectCrops = (s) => s.crops.crops;
 export const selectHealthDistribution = createSelector(
   [selectCrops],
@@ -78,7 +78,7 @@ export const selectWorkersPresentToday = createSelector(
   (records, workers) =>
     records.filter(
       (r) =>
-        r.date === new Date().toISOString().slice(0, 10) &&
+        r.date === localDate() &&
         r.status === "Present" &&
         workers.some((w) => w.id === r.workerId && w.status === "Active"),
     ).length,
@@ -88,7 +88,7 @@ export const selectWorkersAbsentToday = createSelector(
   (records, workers) =>
     records.filter(
       (r) =>
-        r.date === new Date().toISOString().slice(0, 10) &&
+        r.date === localDate() &&
         r.status === "Absent" &&
         workers.some((w) => w.id === r.workerId && w.status === "Active"),
     ).length,
@@ -102,8 +102,12 @@ export const wageFor = (worker, records, month) =>
       0,
     ) * Number(worker.dailyWage);
 export const selectWagesPayable = (month) =>
-  createSelector([selectWorkers, selectAttendance], (workers, records) =>
-    workers.map((w) => ({ ...w, wage: wageFor(w, records, month) })),
+  createSelector([selectWorkers, selectAttendance, (s) => s.expenses.expenses], (workers, records, expenses) =>
+    workers.map((w) => ({
+      ...w,
+      wage: wageFor(w, records, month),
+      unpaidWage: expenses.some((e) => e.id === `wage-${w.id}-${month}`) ? 0 : wageFor(w, records, month),
+    })),
   );
 export const selectProfitByCrop = createSelector(
   [selectCrops, selectBuyers, (s) => s.expenses.expenses],
@@ -121,6 +125,28 @@ export const selectProfitByCrop = createSelector(
       return { crop: c.name, revenue, expense: cost, profit: revenue - cost };
     }),
 );
+export const selectMonthlyProfitByCrop = (month) => createSelector(
+  [selectCrops, selectBuyers, (s) => s.expenses.expenses],
+  (crops, buyers, expenses) => crops.map((c) => {
+    const revenue = buyers.filter((b) => b.cropId === c.id && b.date?.startsWith(month))
+      .reduce((n, b) => n + Number(b.quantity) * Number(b.unitPrice), 0);
+    const cost = expenses.filter((e) => e.cropId === c.id && e.date?.startsWith(month))
+      .reduce((n, e) => n + Number(e.amount), 0);
+    return { crop: c.name, revenue, expense: cost, profit: revenue - cost };
+  }).filter((row) => row.revenue || row.expense),
+);
+export const selectAttendanceTrend = createSelector([selectAttendance], (records) => {
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const day = new Date();
+    day.setDate(day.getDate() - (6 - i));
+    return localDate(day);
+  });
+  return {
+    days,
+    present: days.map((day) => records.filter((r) => r.date === day && r.status === "Present").length),
+    absent: days.map((day) => records.filter((r) => r.date === day && r.status === "Absent").length),
+  };
+});
 export const selectDashboard = createSelector(
   [
     selectStock,
@@ -196,7 +222,7 @@ export const selectAlerts = createSelector(
     equipment
       .filter((e) => e.status === "Under Repair")
       .forEach((e) => add("warning", `${e.name} is under repair`));
-    const today = new Date().toISOString().slice(0, 10);
+    const today = localDate();
     const activeIds = new Set(
       workers.filter((w) => w.status === "Active").map((w) => w.id),
     );

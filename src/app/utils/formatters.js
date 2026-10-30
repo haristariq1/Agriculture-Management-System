@@ -14,9 +14,11 @@ export const dateText = (value) =>
 export const dayDiff = (date, base = new Date()) =>
   Math.round(
     (Date.parse(`${date}T12:00:00Z`) -
-      Date.parse(`${base.toISOString().slice(0, 10)}T12:00:00Z`)) /
+      Date.parse(`${localDate(base)}T12:00:00Z`)) /
       86400000,
   );
+export const localDate = (date = new Date()) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 export const addDays = (date, days) => {
   const d = new Date(`${date}T12:00:00Z`);
   d.setUTCDate(d.getUTCDate() + Number(days));

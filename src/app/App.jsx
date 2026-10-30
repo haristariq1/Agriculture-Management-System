@@ -4,7 +4,7 @@ import { Routes, Route } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "./redux/actions";
 import { GETACTIVITY } from "./redux/actions/activity";
-import { FETCHWEATHER } from "./redux/actions/weather";
+import useWeather from "./hooks/useWeather";
 
 import { HIDETOAST } from "./redux/actions/ui";
 import Sidebar from "./components/common/Sidebar";
@@ -22,10 +22,10 @@ import Tasks from "./views/Tasks";
 import Expenses from "./views/Expenses";
 import NotFound from "./views/NotFound";
 import Login from "./views/Login";
-import { WEATHER } from "../config";
 function Shell() {
   const dispatch = useDispatch();
   const ui = useSelector((s) => s.ui);
+  useWeather();
   useEffect(() => {
     [
       "GETALLUSERS",
@@ -41,9 +41,6 @@ function Shell() {
       "GETMAINTENANCE",
     ].forEach((name) => dispatch(actions[name]()).catch(() => {}));
     dispatch(GETACTIVITY());
-    dispatch(FETCHWEATHER());
-    const id = setInterval(() => dispatch(FETCHWEATHER()), WEATHER.refreshMs);
-    return () => clearInterval(id);
   }, [dispatch]);
   useEffect(() => {
     if (ui.toast) {

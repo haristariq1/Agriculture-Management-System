@@ -37,7 +37,7 @@ These credentials are demo data in a client-only application, not secure authent
 
 ### Known limitations
 
-The named form and table components use shared `RecordForm` and `RecordTable` bases, while validation and persistence remain in the Redux API layer. User management has Redux actions and API operations, but no user-management page is specified in the brief. Demo authentication is necessarily client-side and cannot resist a user who edits localStorage or JavaScript. GitHub and Slack submission are not part of this repository and have not been performed.
+The named form and table components use shared `RecordForm` and `RecordTable` bases, while validation and persistence remain in the Redux API layer. User management has Redux actions and API operations, but no user-management page is specified in the brief. Demo authentication is necessarily client-side and cannot resist a user who edits localStorage or JavaScript. Report PDF output uses the browser Print / Save as PDF dialog. GitHub and Slack submission have not been performed because no Git remote is configured.
 
 ## Screenshot
 
@@ -70,11 +70,11 @@ Each data module has `src/app/redux/actions/<module>/index.js`, `api/<module>/in
 
 ## Configuration
 
-Weather coordinates, display city and refresh interval are configured in `.env` and read centrally by `src/config.js`. Open-Meteo is the only live network dependency. The weather panel retains an error state if offline.
+Weather coordinates, display city and refresh interval are read centrally by `src/config.js`. Defaults work without configuration. To customize, copy `.env.example` to `.env` and edit the values. `.env` is ignored by Git. Open-Meteo is the only live network dependency. The weather panel retains an error state if offline.
 
 ## Testing
 
-`npm test` exercises 26 calculations, validations, storage, weather, user and module CRUD flows. `npm run lint` checks source syntax and undefined names. `npm run build` produces `dist/`. `npm audit --omit=dev` found no production dependency advisories at the time of verification. A browser smoke test covered Admin and Manager login, live weather success, crop add/delete and confirmation, reload persistence, Manager equipment restrictions and all route rendering. Other interactive flows were not fully verified in a browser.
+`npm test` exercises 29 calculations, validations, storage, weather, user and module CRUD flows. `npm run lint` checks source syntax and undefined names. `npm run build` produces `dist/`. Browser checks covered Admin and Manager login/logout, live weather success, all routes, attendance marking, wage expense creation and reload persistence, Manager equipment restrictions, Manager maintenance creation and its linked expense. Earlier checks covered crop add/delete and confirmation. Full interactive CRUD regression on all pages and physical mobile/tablet devices remains outstanding; see `IMPLEMENTATION_CHECKLIST.md`.
 
 ## Assignment
 

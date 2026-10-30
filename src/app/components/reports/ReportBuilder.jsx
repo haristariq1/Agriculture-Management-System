@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { selectProfitByCrop } from "../../redux/selectors";
+import { selectMonthlyProfitByCrop } from "../../redux/selectors";
 import { money } from "../../utils/formatters";
 import { exportCsv } from "../../utils/exportCsv";
 import { exportPdf } from "../../utils/exportPdf";
+import { localDate } from "../../utils/formatters";
 const sections = ["Harvest", "Sales", "Expenses", "Wages", "Maintenance"];
 export default function ReportBuilder() {
-  const [month, setMonth] = useState(new Date().toISOString().slice(0, 7));
+  const [month, setMonth] = useState(localDate().slice(0, 7));
   const [enabled, setEnabled] = useState(
     Object.fromEntries(sections.map((x) => [x, true])),
   );
@@ -15,7 +16,7 @@ export default function ReportBuilder() {
     buyers = useSelector((s) => s.buyers.buyers),
     expenses = useSelector((s) => s.expenses.expenses),
     maintenance = useSelector((s) => s.maintenance.services),
-    profit = useSelector(selectProfitByCrop);
+    profit = useSelector(selectMonthlyProfitByCrop(month));
   const cropName = (id) => crops.find((c) => c.id === id)?.name || "General";
   const harvest = crops
     .filter((c) => c.cuttingDate?.startsWith(month))
@@ -36,7 +37,7 @@ export default function ReportBuilder() {
       amount: Number(b.quantity) * Number(b.unitPrice || 0),
     }));
   const spending = expenses
-    .filter((x) => x.date?.startsWith(month) && x.sourceType !== "wage")
+    .filter((x) => x.date?.startsWith(month) && !x.sourceType)
     .map((e) => ({
       section: "Expenses",
       date: e.date,
@@ -126,12 +127,12 @@ export default function ReportBuilder() {
         </div>
         <div>
           <small>EXPENSES</small>
-          <strong>{money(summary.expenses + summary.wages)}</strong>
+          <strong>{money(summary.expenses + summary.wages + summary.maintenance)}</strong>
         </div>
         <div>
           <small>NET RESULT</small>
           <strong>
-            {money(summary.sales - summary.expenses - summary.wages)}
+            {money(summary.sales - summary.expenses - summary.wages - summary.maintenance)}
           </strong>
         </div>
       </div>

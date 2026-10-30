@@ -1,6 +1,8 @@
 import React from "react";
 import { formatCnic } from "../../utils/validators";
 import EmptyState from "./EmptyState";
+import StatusBadge from "./StatusBadge";
+import { dayDiff } from "../../utils/formatters";
 export default function RecordTable({
   module,
   fields,
@@ -40,9 +42,11 @@ export default function RecordTable({
                           alt=""
                         />
                       )}
-                    {x.key === "cnic"
-                      ? formatCnic(row[x.key])
-                      : labels[row[x.key]] || row[x.key] || "—"}
+                    {x.key === "status" ? (
+                      <StatusBadge status={module === "tasks" && row.status !== "Done" && dayDiff(row.dueDate) < 0 ? "Overdue" : row.status || "—"} />
+                    ) : x.key === "cnic" ? (
+                      formatCnic(row[x.key])
+                    ) : labels[row[x.key]] || row[x.key] || "—"}
                   </td>
                 ))}
               <td>

@@ -4,8 +4,9 @@ import { selectWagesPayable } from "../../redux/selectors";
 import { PAYWAGES } from "../../redux/actions/expenses";
 import { SHOWTOAST } from "../../redux/actions/ui";
 import { money } from "../../utils/formatters";
+import { localDate } from "../../utils/formatters";
 export default function WageSummary() {
-  const [month, setMonth] = useState(new Date().toISOString().slice(0, 7)),
+  const [month, setMonth] = useState(localDate().slice(0, 7)),
     rows = useSelector(selectWagesPayable(month)),
     expenses = useSelector((s) => s.expenses.expenses),
     dispatch = useDispatch();
@@ -40,7 +41,7 @@ export default function WageSummary() {
                 <td>{w.fullName}</td>
                 <td>{money(w.dailyWage)}</td>
                 <td>
-                  <strong>{money(w.wage)}</strong>
+                  <strong>{money(w.unpaidWage)}</strong>
                 </td>
                 <td>
                   <button

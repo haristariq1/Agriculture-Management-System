@@ -1,4 +1,5 @@
 import React from "react";
+import { weatherCondition } from "../../utils/weatherCondition";
 export default function ForecastStrip({ forecast }) {
   return (
     <div className="forecast">
@@ -9,8 +10,8 @@ export default function ForecastStrip({ forecast }) {
               weekday: "short",
             })}
           </small>
-          <i className="bi bi-cloud-sun" />
-          <strong>{Math.round(forecast.temperature_2m_max[i])}°</strong>
+          <i className={`bi ${weatherCondition(forecast.weather_code?.[i]).icon}`} title={weatherCondition(forecast.weather_code?.[i]).label} />
+          <strong>{Math.round(forecast.temperature_2m_max[i])}° / {Math.round(forecast.temperature_2m_min[i])}°</strong>
         </div>
       ))}
     </div>

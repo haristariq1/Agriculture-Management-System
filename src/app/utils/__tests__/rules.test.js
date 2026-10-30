@@ -4,9 +4,10 @@ import {
   validateCnic,
   validatePhone,
   validateImage,
+  validateQuantity,
 } from "../validators";
 import { addDays } from "../formatters";
-import { wageFor } from "../../redux/selectors";
+import { wageFor, selectStock, selectServiceDue, selectMonthlyProfitByCrop } from "../../redux/selectors";
 import { KEYS, mutate, payWage, readList } from "../../redux/api";
 const memory = new Map();
 beforeEach(() => {
@@ -18,11 +19,25 @@ beforeEach(() => {
   });
 });
 describe("business rules", () => {
+  it("derives stock and service dates from Redux state", () => {
+    const state = {
+      crops: { crops: [{ id: "c1", name: "Wheat", harvestQty: 20 }] },
+      buyers: { buyers: [{ id: "b1", cropId: "c1", quantity: 7, unitPrice: 100, date: "2026-10-30" }] },
+      equipment: { equipment: [{ id: "e1", lastServiceDate: "2026-10-30", serviceIntervalDays: 7 }] },
+      expenses: { expenses: [{ id: "x1", cropId: "c1", amount: 200, date: "2026-10-30" }] },
+    };
+    expect(selectStock(state)[0].available).toBe(13);
+    expect(selectServiceDue(state)[0].nextServiceDate).toBe("2026-11-06");
+    expect(selectMonthlyProfitByCrop("2026-10")(state)[0].profit).toBe(500);
+  });
   it("formats CNIC and validates worker inputs", () => {
     expect(formatCnic("1234512345671")).toBe("12345-1234567-1");
     expect(validateCnic("12345-1234567-1")).toBe(true);
     expect(validatePhone("03001234567")).toBe(true);
     expect(validateImage({ type: "image/png", size: 1048577 })).toBe(false);
+    expect(validateCnic("abc1234512345671")).toBe(false);
+    expect(validatePhone("abc03001234567")).toBe(false);
+    expect(validateQuantity(Infinity)).toBe(false);
   });
   it("uses calendar dates for service intervals", () => {
     expect(addDays("2026-10-30", 7)).toBe("2026-11-06");
@@ -41,6 +56,7 @@ describe("business rules", () => {
     ).toBe(1500);
   });
   it("blocks duplicate attendance and over-selling", async () => {
+    memory.set(KEYS.workers, JSON.stringify([{ id: "w1", fullName: "Test Worker", dailyWage: 1000 }]));
     let a = await mutate(
       "attendance",
       "add",
@@ -71,6 +87,8 @@ describe("business rules", () => {
     expect(a.data.succeeded).toBe(false);
   });
   it("links maintenance and wages to expenses once", async () => {
+    memory.set(KEYS.workers, JSON.stringify([{ id: "w1", fullName: "Ali Raza", dailyWage: 1000 }]));
+    memory.set(KEYS.attendance, JSON.stringify([{ id: "a1", workerId: "w1", date: "2026-10-30", status: "Present" }]));
     memory.set(
       KEYS.equipment,
       JSON.stringify([
@@ -246,6 +264,9 @@ describe("CRUD coverage", () => {
   };
   for (const [module, fixture] of Object.entries(fixtures)) {
     it(`${module} adds, updates and removes`, async () => {
+      memory.set(KEYS.crops, JSON.stringify([{ id: "c1", name: "Seed Crop", harvestQty: 100 }]));
+      memory.set(KEYS.workers, JSON.stringify([{ id: "w1", fullName: "Seed Worker", dailyWage: 1000 }]));
+      memory.set(KEYS.equipment, JSON.stringify([{ id: "eq1", name: "Seed Equipment", type: "Tractor", purchaseDate: "2026-01-01", status: "Active", lastServiceDate: "2026-10-01", serviceIntervalDays: 30 }]));
       let r = await mutate(module, "add", fixture, "Admin");
       expect(r.data.succeeded).toBe(true);
       const id = r.data.data.id;
@@ -342,5 +363,19 @@ describe("linked expense integrity", () => {
       (await mutate("expenses", "remove", "service-s1", "Admin")).data
         .succeeded,
     ).toBe(false);
+  });
+  it("rejects invalid numeric records and orphan references", async () => {
+    expect((await mutate("crops", "add", { name: "Rice", field: "A", plantingDate: "2026-01-01", cuttingDate: "2026-02-01", healthScore: "abc", harvestQty: 10, expectedQty: 20 }, "Admin")).data.succeeded).toBe(false);
+    expect((await mutate("attendance", "add", { workerId: "missing", date: "2026-10-30", status: "Present" }, "Admin")).data.succeeded).toBe(false);
+    expect((await mutate("maintenance", "add", { equipmentId: "missing", date: "2026-10-30", description: "Repair", cost: "abc" }, "Admin")).data.succeeded).toBe(false);
+    expect((await mutate("inventory", "add", { item: "Seed", qty: "NaN", minQty: 2, unit: "kg" }, "Admin")).data.succeeded).toBe(false);
+  });
+  it("calculates wage payment from saved attendance rather than trusting a caller amount", async () => {
+    memory.set(KEYS.workers, JSON.stringify([{ id: "w1", fullName: "Ali Raza", dailyWage: 1000 }]));
+    memory.set(KEYS.attendance, JSON.stringify([{ id: "a1", workerId: "w1", date: "2026-10-30", status: "Half-day" }]));
+    expect((await payWage({ id: "w1" }, "2026-10", 1000, "Admin")).data.succeeded).toBe(false);
+    expect((await payWage({ id: "w1" }, "2026-10", 500, "Admin")).data.succeeded).toBe(true);
+    expect((await mutate("attendance", "update", { id: "a1", workerId: "w1", date: "2026-10-30", status: "Present" }, "Admin")).data.succeeded).toBe(false);
+    expect((await mutate("attendance", "remove", "a1", "Admin")).data.succeeded).toBe(false);
   });
 });

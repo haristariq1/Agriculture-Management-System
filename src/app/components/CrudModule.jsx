@@ -27,10 +27,10 @@ import useDebounce from "../hooks/useDebounce";
 import { exportCsv } from "../utils/exportCsv";
 import { validateImage } from "../utils/validators";
 import BuyerDetailsModal from "./buyers/BuyerDetailsModal";
-import { addDays } from "../utils/formatters";
+import { addDays, localDate } from "../utils/formatters";
 import ConfirmModal from "./common/ConfirmModal";
 import SearchBar from "./common/SearchBar";
-const date = () => new Date().toISOString().slice(0, 10);
+const date = () => localDate();
 const field = (key, label, type = "text") => ({ key, label, type });
 export const configs = {
   crops: [
@@ -234,7 +234,7 @@ export default function CrudModule({ module }) {
               "Idle",
             ]
           : module === "tasks"
-            ? ["Pending", "Done"]
+            ? ["Pending", "Done", ...crops.map((c) => c.name)]
             : module === "orders"
               ? ["Pending", "Delivered", "Cancelled"]
               : module === "attendance"
@@ -248,10 +248,13 @@ export default function CrudModule({ module }) {
         : filter === "Needs Attention"
           ? Number(x.healthScore) >= 50 && Number(x.healthScore) < 75
           : Number(x.healthScore) < 50
-      : Object.values(x).includes(filter));
-  let visible = rows.filter(
-    (x) => JSON.stringify(x).toLowerCase().includes(q) && matchesFilter(x),
-  );
+      : module === "tasks" && crops.some((c) => c.name === filter)
+        ? crops.some((c) => c.name === filter && c.id === x.cropId)
+        : Object.values(x).includes(filter));
+  let visible = rows.filter((x) => {
+    const text = module === "buyers" ? `${x.name} ${x.cnic}` : JSON.stringify(x);
+    return text.toLowerCase().includes(q) && matchesFilter(x);
+  });
   const dateKey = {
     crops: "cuttingDate",
     orders: "orderDate",
@@ -263,7 +266,7 @@ export default function CrudModule({ module }) {
     equipment: "lastServiceDate",
     maintenance: "date",
   }[module];
-  if (sort === "old") visible = [...visible].reverse();
+  if (sort === "new") visible = [...visible].reverse();
   if (sort === "date")
     visible = [...visible].sort((a, b) =>
       String(b[dateKey] || "").localeCompare(String(a[dateKey] || "")),

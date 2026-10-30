@@ -3,7 +3,9 @@ import Loader from "../common/Loader";
 import HumidityGauge from "./HumidityGauge";
 import ForecastStrip from "./ForecastStrip";
 import { WEATHER } from "../../../config";
+import { weatherCondition } from "../../utils/weatherCondition";
 export default function WeatherCard({ weather, current, forecast }) {
+  const condition = weatherCondition(current?.weather_code);
   return (
     <section className="dash-card weather-card">
       <div className="dash-head">
@@ -22,10 +24,11 @@ export default function WeatherCard({ weather, current, forecast }) {
       ) : current ? (
         <>
           <div className="weather-main">
-            <i className="bi bi-cloud-sun" />
+            <i className={`bi ${condition.icon}`} />
             <div>
               <strong>{Math.round(current.temperature_2m)}°</strong>
               <span>{WEATHER.city}, Pakistan</span>
+              <small>{condition.label}</small>
             </div>
           </div>
           <div className="weather-metrics">
@@ -50,6 +53,7 @@ export default function WeatherCard({ weather, current, forecast }) {
               ? new Date(weather.lastUpdated).toLocaleTimeString()
               : "—"}
           </small>
+          {weather.status === "failed" && <small className="text-warning">Weather refresh failed; showing the last reading.</small>}
         </>
       ) : null}
     </section>

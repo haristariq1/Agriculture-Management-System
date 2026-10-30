@@ -1,13 +1,9 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { Bar } from "react-chartjs-2";
+import { selectAttendanceTrend } from "../../redux/selectors";
 export default function AttendanceChart() {
-  const records = useSelector((s) => s.attendance.records),
-    days = Array.from({ length: 7 }, (_, i) => {
-      const d = new Date();
-      d.setDate(d.getDate() - (6 - i));
-      return d.toISOString().slice(0, 10);
-    });
+  const { days, present, absent } = useSelector(selectAttendanceTrend);
   return (
     <section className="dash-card chart-card">
       <div className="dash-head">
@@ -26,21 +22,13 @@ export default function AttendanceChart() {
           datasets: [
             {
               label: "Present",
-              data: days.map(
-                (d) =>
-                  records.filter((r) => r.date === d && r.status === "Present")
-                    .length,
-              ),
+              data: present,
               backgroundColor: "#4ea679",
               borderRadius: 5,
             },
             {
               label: "Absent",
-              data: days.map(
-                (d) =>
-                  records.filter((r) => r.date === d && r.status === "Absent")
-                    .length,
-              ),
+              data: absent,
               backgroundColor: "#eaa36e",
               borderRadius: 5,
             },

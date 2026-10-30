@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { MARKATTENDANCE } from "../../redux/actions/attendance";
 import { SHOWTOAST } from "../../redux/actions/ui";
+import { localDate } from "../../utils/formatters";
 export default function AttendanceRegister() {
   const workers = useSelector((s) => s.workers.workers).filter(
       (w) => w.status === "Active",
     ),
     records = useSelector((s) => s.attendance.records),
     dispatch = useDispatch(),
-    [date, setDate] = useState(new Date().toISOString().slice(0, 10)),
+    [date, setDate] = useState(localDate()),
     [statuses, setStatuses] = useState({});
   const month = date.slice(0, 7);
   const save = async () => {
@@ -32,7 +33,7 @@ export default function AttendanceRegister() {
     dispatch(SHOWTOAST(`${done} attendance records saved`));
   };
   return (
-    <section className="section-card">
+    <section id="attendance-register" className="section-card">
       <div className="section-heading">
         <div>
           <span className="eyebrow">DAILY REGISTER</span>

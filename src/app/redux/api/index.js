@@ -1,4 +1,5 @@
 import { seedData } from "../../../fake-db/seedData";
+import { localDate } from "../../utils/formatters";
 import {
   validateName,
   validateCnic,
@@ -63,6 +64,8 @@ export const storageApi = {
     ),
 };
 export function validateRecord(module, item, list, previous) {
+  const finite = (value) => value !== "" && value !== null && value !== undefined && Number.isFinite(Number(value));
+  const nonNegative = (value) => finite(value) && Number(value) >= 0;
   if (["workers", "buyers"].includes(module)) {
     if (!validateName(module === "workers" ? item.fullName : item.name))
       return "Name must contain letters and spaces (at least 3 characters)";
@@ -93,9 +96,14 @@ export function validateRecord(module, item, list, previous) {
       Number(item.quantity) > Number(crop.harvestQty) - sold
     )
       return "Quantity exceeds available crop stock";
-    if (!item.date || Number(item.unitPrice) <= 0)
+    if (!item.date || !finite(item.unitPrice) || Number(item.unitPrice) <= 0)
       return "Date and positive unit price are required";
   }
+  if (module === "attendance" &&
+    (!readList(KEYS.workers).some((w) => w.id === item.workerId) ||
+      !/^\d{4}-\d{2}-\d{2}$/.test(item.date || "") ||
+      !["Present", "Absent", "Half-day", "Leave"].includes(item.status)))
+    return "Select a valid worker, date and attendance status";
   if (
     module === "attendance" &&
     list.some(
@@ -108,18 +116,21 @@ export function validateRecord(module, item, list, previous) {
     return "Attendance already exists for this worker and date";
   if (
     module === "equipment" &&
-    (!item.name?.trim() || !validateServiceInterval(item.serviceIntervalDays))
+    (!item.name?.trim() || !item.purchaseDate || !item.lastServiceDate ||
+      !["Tractor", "Water Pump", "Sprayer", "Harvester", "Other"].includes(item.type) ||
+      !["Active", "Under Repair", "Idle"].includes(item.status) ||
+      !validateServiceInterval(item.serviceIntervalDays))
   )
     return "Equipment name and positive service interval are required";
   if (
     module === "maintenance" &&
-    (!item.equipmentId ||
+    (!readList(KEYS.equipment).some((e) => e.id === item.equipmentId) ||
       !item.date ||
       !item.description?.trim() ||
-      Number(item.cost) < 0)
+      !nonNegative(item.cost))
   )
     return "Complete service details and enter a non-negative cost";
-  if (module === "orders" && (!validateQuantity(item.quantity) || !item.cropId))
+  if (module === "orders" && (!validateQuantity(item.quantity) || !readList(KEYS.crops).some((c) => c.id === item.cropId)))
     return "Select a crop and positive quantity";
   if (
     module === "crops" &&
@@ -127,10 +138,10 @@ export function validateRecord(module, item, list, previous) {
       !item.field?.trim() ||
       !item.plantingDate ||
       !item.cuttingDate ||
-      Number(item.healthScore) < 0 ||
+      !finite(item.healthScore) || Number(item.healthScore) < 0 ||
       Number(item.healthScore) > 100 ||
-      Number(item.harvestQty) < 0 ||
-      Number(item.expectedQty) < 0)
+      !nonNegative(item.harvestQty) ||
+      !nonNegative(item.expectedQty))
   )
     return "Complete crop details; health must be 0–100 and quantities non-negative";
   if (
@@ -138,17 +149,18 @@ export function validateRecord(module, item, list, previous) {
     (!item.title?.trim() || !item.type || !item.dueDate)
   )
     return "Task title, type and due date are required";
-  if (module === "expenses" && (!item.category || Number(item.amount) <= 0))
+  if (module === "expenses" && (!item.category || !finite(item.amount) || Number(item.amount) <= 0 || !item.date))
     return "Category and positive amount are required";
   if (
     module === "inventory" &&
-    (!item.item || Number(item.qty) < 0 || Number(item.minQty) < 0)
+    (!item.item?.trim() || !nonNegative(item.qty) || !nonNegative(item.minQty) || !item.unit?.trim())
   )
     return "Item and non-negative quantities are required";
   return null;
 }
 export async function mutate(module, kind, item, role) {
-  if (!role) return bad("Please sign in");
+  if (!keyForModule(module)) return bad("Unsupported module");
+  if (!["Admin", "Manager"].includes(role)) return bad("Please sign in");
   if (
     role === "Manager" &&
     (["update", "remove"].includes(kind) ||
@@ -157,6 +169,12 @@ export async function mutate(module, kind, item, role) {
     return bad("Admin permission required");
   const key = KEYS[module],
     list = readList(key);
+  if (module === "attendance") {
+    const current = kind === "remove" ? list.find((x) => x.id === (typeof item === "string" ? item : item.id)) : item;
+    const previous = kind === "update" ? list.find((x) => x.id === item.id) : null;
+    if ([current, previous].some((record) => record && readList(KEYS.expenses).some((e) => e.id === `wage-${record.workerId}-${record.date?.slice(0, 7)}`)))
+      return bad("Attendance is locked after wages are paid for that month");
+  }
   let next, payload;
   if (kind === "add") {
     payload = { ...item, id: uid() };
@@ -209,6 +227,7 @@ export async function mutate(module, kind, item, role) {
   }
   return ok(payload, `${module} ${kind} successful`);
 }
+const keyForModule = (module) => ["crops", "orders", "buyers", "tasks", "expenses", "inventory", "workers", "attendance", "equipment", "maintenance"].includes(module);
 function syncMaintenance(services) {
   const current = readList(KEYS.expenses);
   const manual = current.filter((x) => x.sourceType !== "maintenance");
@@ -245,8 +264,16 @@ function syncMaintenance(services) {
   return true;
 }
 export async function payWage(worker, month, amount, role) {
-  if (!role) return bad("Please sign in");
-  if (Number(amount) <= 0) return bad("No wages payable");
+  if (!["Admin", "Manager"].includes(role)) return bad("Please sign in");
+  if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month || "")) return bad("Invalid wage month");
+  const savedWorker = readList(KEYS.workers).find((w) => w.id === worker?.id);
+  if (!savedWorker) return bad("Worker not found");
+  const days = readList(KEYS.attendance)
+    .filter((r) => r.workerId === savedWorker.id && r.date?.startsWith(month))
+    .reduce((total, r) => total + (r.status === "Present" ? 1 : r.status === "Half-day" ? 0.5 : 0), 0);
+  const payable = days * Number(savedWorker.dailyWage);
+  if (!Number.isFinite(payable) || payable <= 0) return bad("No wages payable");
+  if (Number(amount) !== payable) return bad("Wage amount is out of date");
   const id = `wage-${worker.id}-${month}`,
     list = readList(KEYS.expenses);
   if (list.some((x) => x.id === id))
@@ -257,9 +284,9 @@ export async function payWage(worker, month, amount, role) {
     sourceId: worker.id,
     category: "Labour",
     cropId: "",
-    amount: Number(amount),
-    date: new Date().toISOString().slice(0, 10),
-    note: `${worker.fullName} • ${month}`,
+    amount: payable,
+    date: localDate(),
+    note: `${savedWorker.fullName} • ${month}`,
   };
   return writeList(KEYS.expenses, [...list, item])
     ? ok(item, "Wages paid")

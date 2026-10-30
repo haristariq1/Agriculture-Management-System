@@ -22,7 +22,7 @@ import {
   selectWagesPayable,
   selectHealthDistribution,
 } from "../redux/selectors";
-import { money } from "../utils/formatters";
+import { money, localDate } from "../utils/formatters";
 export default function Dashboard() {
   const stats = useSelector(selectDashboard),
     stock = useSelector(selectStock),
@@ -33,7 +33,7 @@ export default function Dashboard() {
     present = useSelector(selectWorkersPresentToday),
     absent = useSelector(selectWorkersAbsentToday),
     wages = useSelector(
-      selectWagesPayable(new Date().toISOString().slice(0, 7)),
+      selectWagesPayable(localDate().slice(0, 7)),
     ),
     weather = useSelector((s) => s.weather);
   const current = weather.data?.current,

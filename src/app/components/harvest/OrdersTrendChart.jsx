@@ -1,6 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { Bar } from "react-chartjs-2";
+import { localDate } from "../../utils/formatters";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -15,7 +16,7 @@ export default function OrdersTrendChart() {
     days = Array.from({ length: 7 }, (_, i) => {
       const d = new Date();
       d.setDate(d.getDate() - (6 - i));
-      return d.toISOString().slice(0, 10);
+      return localDate(d);
     });
   return (
     <section className="dash-card chart-card mb-4">

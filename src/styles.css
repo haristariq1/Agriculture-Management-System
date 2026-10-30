@@ -765,7 +765,22 @@ button {
 .dark .table {
   --bs-table-bg: #23362a;
   --bs-table-color: #e4ece6;
+  --bs-table-border-color: #34523d;
 }
+.dark .form-control,
+.dark .form-select {
+  background-color: #1b2d22;
+  border-color: #47624c;
+  color: #e4ece6;
+  color-scheme: dark;
+}
+.dark .form-control::placeholder { color: #9bb3a1; }
+.dark .modal-content { background: #23362a; color: #e4ece6; }
+.dark .btn-light,
+.dark .badge.text-bg-light { background: #34523d !important; color: #e4ece6 !important; border-color: #47624c !important; }
+.dark .page-title h1,
+.dark .section-heading h2,
+.dark .dash-head h3 { color: #e4ece6; }
 .dark .topbar-location,
 .dark .page-title p {
   color: #b0c2b6;

@@ -5,10 +5,10 @@ export const formatCnic = (value) => {
 };
 export const validateName = (value) =>
   /^[A-Za-z ]{3,}$/.test(String(value || "").trim());
-export const validateCnic = (value) => digits(value).length === 13;
-export const validatePhone = (value) => digits(value).length === 11;
-export const validateWage = (value) => Number(value) > 0;
-export const validateQuantity = (value) => Number(value) > 0;
+export const validateCnic = (value) => /^(?:\d{13}|\d{5}-\d{7}-\d)$/.test(String(value || ""));
+export const validatePhone = (value) => /^\d{11}$/.test(String(value || ""));
+export const validateWage = (value) => Number.isFinite(Number(value)) && Number(value) > 0;
+export const validateQuantity = (value) => Number.isFinite(Number(value)) && Number(value) > 0;
 export const validateServiceInterval = (value) =>
   Number.isInteger(Number(value)) && Number(value) > 0;
 export const validateLogin = (u, p) => Boolean(u?.trim() && p?.trim());

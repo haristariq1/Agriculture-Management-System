@@ -29,8 +29,11 @@ export default function WorkforceCard({ stats, present, absent, wages }) {
       </div>
       <div className="wage-strip">
         Wages payable this month{" "}
-        <strong>{money(wages.reduce((n, w) => n + w.wage, 0))}</strong>
+        <strong>{money(wages.reduce((n, w) => n + w.unpaidWage, 0))}</strong>
       </div>
+      <Link className="btn btn-sm btn-brand mt-3" to="/workers#attendance-register">
+        Mark attendance
+      </Link>
     </section>
   );
 }

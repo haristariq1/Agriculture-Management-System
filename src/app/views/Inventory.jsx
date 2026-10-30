@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import CrudModule from "../components/CrudModule";
 import { ADDUSAGE } from "../redux/actions/inventory";
 import { SHOWTOAST } from "../redux/actions/ui";
+import { localDate } from "../utils/formatters";
 export default function Inventory() {
   const items = useSelector((s) => s.inventory.items),
     user = useSelector((s) => s.user.user),
@@ -10,7 +11,7 @@ export default function Inventory() {
     [form, setForm] = useState({
       id: "",
       quantity: "",
-      date: new Date().toISOString().slice(0, 10),
+      date: localDate(),
       note: "",
     });
   return (

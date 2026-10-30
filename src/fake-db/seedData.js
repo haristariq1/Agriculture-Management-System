@@ -1,4 +1,5 @@
-const today = new Date().toISOString().slice(0, 10);
+import { localDate } from "../app/utils/formatters";
+const today = localDate();
 export const seedData = {
   crops: [
     {
