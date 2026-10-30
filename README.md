@@ -37,7 +37,7 @@ These credentials are demo data in a client-only application, not secure authent
 
 ### Known limitations
 
-The data entry and record tables share a reusable CRUD component rather than every form and table file named in sections 8–9 of the brief. Several exact component file names are incomplete; the shared CRUD component supplies those flows. Demo authentication is necessarily client-side and cannot resist a user who edits localStorage or JavaScript. GitHub and Slack submission are not part of this repository and have not been performed.
+The named form and table components use shared `RecordForm` and `RecordTable` bases, while validation and persistence remain in the Redux API layer. Demo authentication is necessarily client-side and cannot resist a user who edits localStorage or JavaScript. GitHub and Slack submission are not part of this repository and have not been performed.
 
 ## Screenshot
 
@@ -70,11 +70,11 @@ Each data module has `src/app/redux/actions/<module>/index.js`, `api/<module>/in
 
 ## Configuration
 
-Weather coordinates, display city and refresh interval are in `src/config.js`. Open-Meteo is the only live network dependency. The weather panel retains an error state if offline.
+Weather coordinates, display city and refresh interval are configured in `.env` and read centrally by `src/config.js`. Open-Meteo is the only live network dependency. The weather panel retains an error state if offline.
 
 ## Testing
 
-`npm test` exercises 21 critical calculations, validations, storage cases and module CRUD flows. `npm run lint` checks source syntax and undefined names. `npm run build` produces `dist/`. `npm audit --omit=dev` found no production dependency advisories at the time of verification. A browser smoke test covered Admin and Manager login, live weather success, crop add/delete and confirmation, reload persistence, Manager equipment restrictions and all route rendering. Other interactive flows were not fully verified in a browser.
+`npm test` exercises 23 calculations, validations, storage, weather and module CRUD flows. `npm run lint` checks source syntax and undefined names. `npm run build` produces `dist/`. `npm audit --omit=dev` found no production dependency advisories at the time of verification. A browser smoke test covered Admin and Manager login, live weather success, crop add/delete and confirmation, reload persistence, Manager equipment restrictions and all route rendering. Other interactive flows were not fully verified in a browser.
 
 ## Assignment
 

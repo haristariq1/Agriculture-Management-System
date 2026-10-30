@@ -1,6 +1,7 @@
 import React from "react";
 import CrudModule from "../components/CrudModule";
 import HarvestSummary from "../components/harvest/HarvestSummary";
+import OrdersSummary from "../components/harvest/OrdersSummary";
 import OrdersTrendChart from "../components/harvest/OrdersTrendChart";
 export default function HarvestOrders() {
   return (
@@ -11,6 +12,7 @@ export default function HarvestOrders() {
         <p>Understand crop stock, sales and customer demand.</p>
       </div>
       <HarvestSummary />
+      <OrdersSummary />
       <OrdersTrendChart />
       <CrudModule module="orders" />
     </>

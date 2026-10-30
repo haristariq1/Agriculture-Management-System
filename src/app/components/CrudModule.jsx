@@ -1,14 +1,34 @@
+import CropForm from "./crops/CropForm";
+import CropTable from "./crops/CropTable";
+import OrderForm from "./harvest/OrderForm";
+import OrdersTable from "./harvest/OrdersTable";
+import BuyerForm from "./buyers/BuyerForm";
+import BuyerTable from "./buyers/BuyerTable";
+import TaskForm from "./tasks/TaskForm";
+import TaskList from "./tasks/TaskList";
+import ExpenseForm from "./expenses/ExpenseForm";
+import ExpenseTable from "./expenses/ExpenseTable";
+import InventoryForm from "./inventory/InventoryForm";
+import InventoryTable from "./inventory/InventoryTable";
+import WorkerForm from "./workers/WorkerForm";
+import WorkerTable from "./workers/WorkerTable";
+import EquipmentForm from "./equipment/EquipmentForm";
+import EquipmentTable from "./equipment/EquipmentTable";
+import MaintenanceForm from "./equipment/MaintenanceForm";
+import MaintenanceLog from "./equipment/MaintenanceLog";
 import React, { useState } from "react";
+import RecordForm from "./common/RecordForm";
+import RecordTable from "./common/RecordTable";
 import { useDispatch, useSelector } from "react-redux";
 import * as A from "../redux/actions";
 import { SHOWTOAST } from "../redux/actions/ui";
 import useRole from "../hooks/useRole";
 import useDebounce from "../hooks/useDebounce";
 import { exportCsv } from "../utils/exportCsv";
-import { formatCnic, validateImage } from "../utils/validators";
+import { validateImage } from "../utils/validators";
+import BuyerDetailsModal from "./buyers/BuyerDetailsModal";
 import { addDays } from "../utils/formatters";
 import ConfirmModal from "./common/ConfirmModal";
-import EmptyState from "./common/EmptyState";
 import SearchBar from "./common/SearchBar";
 const date = () => new Date().toISOString().slice(0, 10);
 const field = (key, label, type = "text") => ({ key, label, type });
@@ -152,7 +172,31 @@ export const configs = {
     ],
   ],
 };
+const formComponents = {
+  crops: CropForm,
+  orders: OrderForm,
+  buyers: BuyerForm,
+  tasks: TaskForm,
+  expenses: ExpenseForm,
+  inventory: InventoryForm,
+  workers: WorkerForm,
+  equipment: EquipmentForm,
+  maintenance: MaintenanceForm,
+};
+const tableComponents = {
+  crops: CropTable,
+  orders: OrdersTable,
+  buyers: BuyerTable,
+  tasks: TaskList,
+  expenses: ExpenseTable,
+  inventory: InventoryTable,
+  workers: WorkerTable,
+  equipment: EquipmentTable,
+  maintenance: MaintenanceLog,
+};
 export default function CrudModule({ module }) {
+  const FormComponent = formComponents[module] || RecordForm;
+  const TableComponent = tableComponents[module] || RecordTable;
   const [title, slot, names, fields] = configs[module],
     dispatch = useDispatch(),
     rows = useSelector((s) => s[module][slot]),
@@ -337,212 +381,32 @@ export default function CrudModule({ module }) {
           ))}
         </select>
       </div>
-      <div className="table-responsive">
-        <table className="table align-middle">
-          <thead>
-            <tr>
-              {fields
-                .filter((x) => x.type !== "image")
-                .map((x) => (
-                  <th key={x.key}>{x.label}</th>
-                ))}
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {visible.map((row) => (
-              <tr key={row.id}>
-                {fields
-                  .filter((x) => x.type !== "image")
-                  .map((x) => (
-                    <td key={x.key}>
-                      {module === "buyers" &&
-                        x.key === "name" &&
-                        row.imageBase64 && (
-                          <img
-                            className="buyer-thumb me-2"
-                            src={row.imageBase64}
-                            alt=""
-                          />
-                        )}
-                      {x.key === "cnic"
-                        ? formatCnic(row[x.key])
-                        : labels[row[x.key]] || row[x.key] || "—"}
-                    </td>
-                  ))}
-                <td>
-                  <div className="d-flex gap-1">
-                    {module === "buyers" && (
-                      <button
-                        className="btn btn-sm btn-outline-secondary"
-                        onClick={() => setDetails(row)}
-                      >
-                        View
-                      </button>
-                    )}
-                    {canEdit && !(module === "expenses" && row.sourceType) && (
-                      <>
-                        <button
-                          className="btn btn-sm btn-outline-primary"
-                          onClick={() => setForm({ ...row })}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="btn btn-sm btn-outline-danger"
-                          onClick={() => setConfirm(row)}
-                        >
-                          Delete
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {!visible.length && <EmptyState />}
-      </div>
-      {form && (
-        <div className="modal-layer">
-          <div className="modal-card">
-            <div className="d-flex justify-content-between mb-3">
-              <h3>
-                {form.id ? "Edit" : "Add"} {title}
-              </h3>
-              <button className="btn-close" onClick={() => setForm(null)} />
-            </div>
-            <form onSubmit={save}>
-              <div className="row g-3">
-                {fields.map((x) => (
-                  <div className="col-md-6" key={x.key}>
-                    <label className="form-label">{x.label}</label>
-                    {x.type.startsWith("select:") ? (
-                      <select
-                        required
-                        className="form-select"
-                        value={form[x.key] || ""}
-                        onChange={(e) =>
-                          setForm({ ...form, [x.key]: e.target.value })
-                        }
-                      >
-                        <option value="">Select</option>
-                        {x.type
-                          .slice(7)
-                          .split("|")
-                          .map((v) => (
-                            <option key={v}>{v}</option>
-                          ))}
-                      </select>
-                    ) : [
-                        "crop",
-                        "cropOptional",
-                        "worker",
-                        "equipment",
-                      ].includes(x.type) ? (
-                      <select
-                        required={x.type !== "cropOptional"}
-                        className="form-select"
-                        value={form[x.key] || ""}
-                        onChange={(e) =>
-                          setForm({ ...form, [x.key]: e.target.value })
-                        }
-                      >
-                        <option value="">Select</option>
-                        {(x.type.startsWith("crop")
-                          ? crops
-                          : x.type === "worker"
-                            ? workers
-                            : machines
-                        ).map((v) => (
-                          <option key={v.id} value={v.id}>
-                            {v.name || v.fullName}
-                          </option>
-                        ))}
-                      </select>
-                    ) : x.type === "image" ? (
-                      <>
-                        <input
-                          type="file"
-                          accept="image/jpeg,image/png"
-                          className="form-control"
-                          onChange={photo}
-                        />
-                        {form.imageBase64 && (
-                          <img
-                            className="image-preview"
-                            src={form.imageBase64}
-                            alt="Preview"
-                          />
-                        )}
-                      </>
-                    ) : (
-                      <input
-                        required={
-                          !["note", "notes", "performedBy"].includes(x.key)
-                        }
-                        className="form-control"
-                        type={x.type}
-                        min={x.type === "number" ? 0 : undefined}
-                        value={form[x.key] ?? ""}
-                        onChange={(e) =>
-                          setForm({
-                            ...form,
-                            [x.key]:
-                              x.key === "cnic"
-                                ? formatCnic(e.target.value)
-                                : e.target.value,
-                          })
-                        }
-                      />
-                    )}
-                  </div>
-                ))}
-              </div>
-              <div className="d-flex justify-content-end gap-2 mt-4">
-                <button
-                  type="button"
-                  className="btn btn-light"
-                  onClick={() => setForm(null)}
-                >
-                  Cancel
-                </button>
-                <button className="btn btn-brand">Save record</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-      {details && (
-        <div className="modal-layer">
-          <div className="modal-card confirm-card">
-            <button
-              className="btn-close float-end"
-              onClick={() => setDetails(null)}
-            />
-            <h3>Buyer details</h3>
-            <img
-              className="buyer-large"
-              src={details.imageBase64}
-              alt={details.name}
-            />
-            <p>
-              <strong>{details.name}</strong>
-              <br />
-              {formatCnic(details.cnic)}
-              <br />
-              {labels[details.cropId]} · {details.quantity} kg · {details.date}
-            </p>
-            <button
-              className="btn btn-outline-secondary"
-              onClick={() => window.print()}
-            >
-              Print
-            </button>
-          </div>
-        </div>
-      )}
+      <TableComponent
+        module={module}
+        fields={fields}
+        visible={visible}
+        labels={labels}
+        canEdit={canEdit}
+        setDetails={setDetails}
+        setForm={setForm}
+        setConfirm={setConfirm}
+      />
+      <FormComponent
+        form={form}
+        title={title}
+        setForm={setForm}
+        save={save}
+        fields={fields}
+        crops={crops}
+        workers={workers}
+        machines={machines}
+        photo={photo}
+      />
+      <BuyerDetailsModal
+        buyer={details}
+        cropName={labels[details?.cropId]}
+        onClose={() => setDetails(null)}
+      />
       <ConfirmModal
         record={confirm}
         onCancel={() => setConfirm(null)}

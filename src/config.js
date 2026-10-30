@@ -1,6 +1,6 @@
 export const WEATHER = {
-  city: "Lahore",
-  latitude: 31.5204,
-  longitude: 74.3587,
-  refreshMs: 600000,
+  city: import.meta.env.VITE_WEATHER_CITY || "Lahore",
+  latitude: Number(import.meta.env.VITE_WEATHER_LATITUDE || 31.5204),
+  longitude: Number(import.meta.env.VITE_WEATHER_LONGITUDE || 74.3587),
+  refreshMs: Number(import.meta.env.VITE_WEATHER_REFRESH_MS || 600000),
 };

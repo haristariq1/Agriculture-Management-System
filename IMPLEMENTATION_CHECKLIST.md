@@ -13,7 +13,7 @@ Source: U Devs Batch 6 Agriculture Management System Extended v2, all 14 pages r
 | Wage and maintenance expense links | Implemented |
 | CNIC/image/stock/attendance validation | Implemented |
 | Search, status filter, sort, CSV and print | Implemented with shared controls |
-| Exact section 8 component file names | Partial: dashboard/common components split; forms and tables use reusable CRUD |
+| All 50 named section 8 component files | Implemented with shared form/table bases |
 | Inventory usage history | Implemented |
 | Bulk attendance and monthly attendance breakdown | Implemented |
 | Buyer photo zoom/details | Implemented |
