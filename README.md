@@ -39,6 +39,10 @@ These credentials are demo data in a client-only application, not secure authent
 
 The delivered interface uses a reusable CRUD component rather than every component file named in sections 8–9 of the brief. The detailed monthly harvest report, some requested charts, and several exact component file names are incomplete. Demo authentication is necessarily client-side and cannot resist a user who edits localStorage or JavaScript. GitHub and Slack submission are not part of this repository and have not been performed.
 
+## Screenshot
+
+![Dashboard](dashboard-screenshot.png)
+
 ## Architecture
 
 ```
