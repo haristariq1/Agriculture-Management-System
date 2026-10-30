@@ -19,5 +19,6 @@ Source: U Devs Batch 6 Agriculture Management System Extended v2, all 14 pages r
 | Buyer photo zoom/details | Implemented |
 | Monthly report sections and export | Implemented |
 | Harvest, health, orders, attendance and profit charts | Implemented |
+| Automated CRUD tests for every data module | Implemented |
 | Full browser verification of every CRUD flow | Incomplete |
 | GitHub push and Slack submission | Not performed |

@@ -74,7 +74,7 @@ Weather coordinates, display city and refresh interval are in `src/config.js`. O
 
 ## Testing
 
-`npm test` exercises the critical pure rules and storage API cases. `npm run lint` checks source syntax and undefined names. `npm run build` produces `dist/`. A browser smoke test covered Admin and Manager login, live weather success, crop add/delete and confirmation, reload persistence, Manager equipment restrictions and all route rendering. Other interactive flows were not fully verified in a browser.
+`npm test` exercises 20 critical calculations, validations, storage cases and module CRUD flows. `npm run lint` checks source syntax and undefined names. `npm run build` produces `dist/`. A browser smoke test covered Admin and Manager login, live weather success, crop add/delete and confirmation, reload persistence, Manager equipment restrictions and all route rendering. Other interactive flows were not fully verified in a browser.
 
 ## Assignment
 
