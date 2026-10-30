@@ -2,3 +2,4 @@
 @media print{.sidebar,.topbar,.btn,.toolbar,.app-toast{display:none!important}.content{padding:0}.main-area{width:100%}}
 
 .buyer-thumb{width:29px;height:29px;object-fit:cover;border-radius:50%}.buyer-large{display:block;max-width:100%;width:190px;height:190px;object-fit:cover;border-radius:12px;margin:20px auto}
+.report-sections{display:flex;flex-wrap:wrap;gap:17px;margin:0 0 20px;font-size:12px;color:#5d7567}.report-sections label{display:flex;align-items:center;gap:5px}.report-sections input{accent-color:#287d5b}

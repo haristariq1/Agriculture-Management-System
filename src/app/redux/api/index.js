@@ -15,10 +15,11 @@ export function validateRecord(module,item,list,previous){
  }
  if(module==='workers'&&(!validatePhone(item.phone)||!validateWage(item.dailyWage)))return 'Phone must have 11 digits and daily wage must be greater than zero';
  if(module==='buyers'){
-  if(!item.imageBase64?.startsWith('data:image/'))return 'A JPG or PNG photo is required';
+  if(!/^data:image\/(jpeg|png);base64,/.test(item.imageBase64||'')||((item.imageBase64||'').split(',')[1]||'').length*3/4>1048576)return 'A JPG or PNG photo up to 1 MB is required';
   const crop=readList(KEYS.crops).find(c=>c.id===item.cropId);
   const sold=list.filter(x=>x.cropId===item.cropId&&x.id!==item.id).reduce((n,x)=>n+Number(x.quantity),0);
   if(!crop||!validateQuantity(item.quantity)||Number(item.quantity)>Number(crop.harvestQty)-sold)return 'Quantity exceeds available crop stock';
+  if(!item.date||Number(item.unitPrice)<=0)return 'Date and positive unit price are required';
  }
  if(module==='attendance'&&list.some(x=>x.id!==item.id&&x.workerId===item.workerId&&x.date===item.date))return 'Attendance already exists for this worker and date';
  if(module==='equipment'&&(!item.name?.trim()||!validateServiceInterval(item.serviceIntervalDays)))return 'Equipment name and positive service interval are required';

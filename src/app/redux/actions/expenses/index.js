@@ -1,5 +1,7 @@
 import * as api from '../../api/expenses';
 import {REQUEST,SUCCESS,FAILURE,EXPENSE_REQUEST as T} from '../utilities';
+import {payWage} from '../../api';
+export const PAYWAGES=(worker,month,amount)=>async(dispatch,getState)=>{dispatch(REQUEST(T.ADD_EXPENSE_REQUEST));const response=await payWage(worker,month,amount,getState().user.user?.role);if(!response.data.succeeded){dispatch(FAILURE(T.ADD_EXPENSE_FAILURE,response.data.message));throw Error(response.data.message)}dispatch(SUCCESS(T.ADD_EXPENSE_SUCCESS,response.data.data));return response.data.data};
 export const GETEXPENSES=(data,moveToNext,failure)=>async(dispatch,getState)=>{
  dispatch(REQUEST(T.GET_EXPENSE_REQUEST));
  try{const response=await api.getexpenses();if(!response.data.succeeded)throw Error(response.data.message);

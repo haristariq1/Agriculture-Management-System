@@ -17,6 +17,7 @@ Source: U Devs Batch 6 Agriculture Management System Extended v2, all 14 pages r
 | Inventory usage history | Implemented |
 | Bulk attendance and monthly attendance breakdown | Implemented |
 | Buyer photo zoom/details | Implemented |
-| Monthly report depth and charts | Partial |
+| Monthly report sections and export | Implemented |
+| All requested analytics charts | Partial |
 | Full browser verification of every CRUD flow | Incomplete |
 | GitHub push and Slack submission | Not performed |
