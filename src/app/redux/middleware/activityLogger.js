@@ -1,0 +1,2 @@
+import {KEYS,readList,writeList,uid} from '../api';
+export const activityLogger=store=>next=>action=>{const result=next(action);const match=action.type.match(/^([^/]+)\/(add|update|remove|usage)_success$/);if(match){const item={id:uid(),user:store.getState().user.user?.username||'System',action:match[2],entity:match[1],recordId:action.payload?.id,timestamp:new Date().toISOString()};writeList(KEYS.activity,[item,...readList(KEYS.activity)]);store.dispatch({type:'activity/log_success',payload:item})}return result};

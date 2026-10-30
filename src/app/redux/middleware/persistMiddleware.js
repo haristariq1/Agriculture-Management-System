@@ -1,0 +1,3 @@
+import {KEYS,writeList} from '../api';
+const fields={crops:'crops',orders:'orders',buyers:'buyers',tasks:'tasks',expenses:'expenses',inventory:'items',workers:'workers',attendance:'records',equipment:'equipment',maintenance:'services',activity:'logs'};
+export const persistMiddleware=store=>next=>action=>{const result=next(action);if(action.type.endsWith('_success')){const module=action.type.split('/')[0];if(fields[module])writeList(KEYS[module],store.getState()[module][fields[module]]);if(module==='user'){try{localStorage.setItem(KEYS.session,JSON.stringify(store.getState().user.user))}catch{}}}if(action.type==='ui/toggle_theme'){try{localStorage.setItem('agri_theme',store.getState().ui.theme)}catch{}}return result};
