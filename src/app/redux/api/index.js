@@ -47,14 +47,14 @@ export async function mutate(module,kind,item,role){
   if(module==='equipment'&&readList(KEYS.maintenance).some(x=>x.equipmentId===id))return bad('Equipment has maintenance history');
  }else return bad('Unsupported operation');
  if(!writeList(key,next))return bad('Storage is full or unavailable');
- if(module==='maintenance')syncMaintenance(next);
+ if(module==='maintenance'&&!syncMaintenance(next)){writeList(key,list);return bad('Storage is full or unavailable')}
  return ok(payload,`${module} ${kind} successful`);
 }
 function syncMaintenance(services){
  const current=readList(KEYS.expenses);const manual=current.filter(x=>x.sourceType!=='maintenance');
  const linked=services.filter(s=>Number(s.cost)>0).map(s=>({id:`service-${s.id}`,sourceType:'maintenance',sourceId:s.id,category:'Repair/Fuel',cropId:'',amount:Number(s.cost),date:s.date,note:`Service: ${s.description}`}));
- writeList(KEYS.expenses,[...manual,...linked]);
- const machines=readList(KEYS.equipment).map(e=>({...e,originalServiceDate:e.originalServiceDate||e.lastServiceDate,lastServiceDate:services.filter(s=>s.equipmentId===e.id).map(s=>s.date).sort().at(-1)||e.originalServiceDate||e.lastServiceDate}));writeList(KEYS.equipment,machines);
+ if(!writeList(KEYS.expenses,[...manual,...linked]))return false;
+ const originalMachines=readList(KEYS.equipment);const machines=originalMachines.map(e=>({...e,originalServiceDate:e.originalServiceDate||e.lastServiceDate,lastServiceDate:services.filter(s=>s.equipmentId===e.id).map(s=>s.date).sort().at(-1)||e.originalServiceDate||e.lastServiceDate}));if(!writeList(KEYS.equipment,machines)){writeList(KEYS.expenses,current);return false}return true;
 }
 export async function payWage(worker,month,amount,role){
  if(!role)return bad('Please sign in');if(Number(amount)<=0)return bad('No wages payable');
