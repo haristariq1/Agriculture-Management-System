@@ -1,0 +1,2 @@
+exports.notFound = (_req, res) => res.status(404).json({ succeeded: false, message: 'Route not found', data: null });
+exports.errorHandler = (err, _req, res, _next) => { const status = err.status || (err.name === 'SequelizeUniqueConstraintError' ? 409 : err.name === 'SequelizeValidationError' || err.name === 'MulterError' || err.type === 'entity.too.large' ? 400 : 500); res.status(status).json({ succeeded: false, message: err.message || 'Server error', data: null }); };

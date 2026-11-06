@@ -1,0 +1,1 @@
+import { resource } from '../crud'; const api = resource('/crops'); export const getcrops = api.get; export const addcrop = api.add; export const updatecrop = api.update; export const removecrop = api.remove;

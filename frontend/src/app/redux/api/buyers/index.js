@@ -1,0 +1,3 @@
+import client from '../client'; import { resource } from '../crud'; const api = resource('/buyers');
+const asForm = (item) => { const form = new globalThis.FormData(); Object.entries(item).forEach(([key, value]) => { if (['id', 'imageBase64', 'photoUrl', 'Crop', 'createdAt', 'updatedAt'].includes(key) || value == null) return; if (key === 'photoFile' && typeof globalThis.File !== 'undefined' && value instanceof globalThis.File) form.append('photo', value); else if (key !== 'photoFile') form.append(key, value); }); return form; };
+export const getbuyers = api.get; export const savebuyer = (item) => client.post('/buyers', asForm(item)); export const updatebuyer = (item) => client.put(`/buyers/${item.id}`, asForm(item)); export const removebuyer = api.remove;

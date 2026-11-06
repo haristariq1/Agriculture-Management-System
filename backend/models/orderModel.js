@@ -1,0 +1,2 @@
+const { DataTypes } = require('sequelize'); const sequelize = require('../config/db');
+module.exports = sequelize.define('Order', { id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true }, cropId: { type: DataTypes.UUID, allowNull: false }, quantity: { type: DataTypes.DECIMAL(12, 2), allowNull: false, validate: { min: 0.01 } }, orderDate: { type: DataTypes.DATEONLY, allowNull: false }, status: { type: DataTypes.ENUM('Pending', 'Delivered', 'Cancelled'), allowNull: false, defaultValue: 'Pending' } }, { tableName: 'orders', timestamps: true });

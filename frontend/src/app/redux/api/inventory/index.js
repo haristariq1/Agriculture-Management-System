@@ -1,0 +1,1 @@
+import client from '../client'; import { resource } from '../crud'; const api = resource('/inventory'); export const getinventory = api.get; export const additem = api.add; export const updateitem = api.update; export const removeitem = api.remove; export const addusage = (data) => client.post(`/inventory/${data.id}/usage`, data);
