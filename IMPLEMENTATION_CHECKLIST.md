@@ -1,6 +1,6 @@
-# U Devs Batch 6 Extended v2 — final requirements audit
+# Historical Frontend-Only Audit (Superseded)
 
-Source: `UDevs_Batch6_Agriculture_Management_System_Extended_v2.pdf` (14 pages). Checked against source, tests and the local browser on 31 October 2026. `Complete` means implemented with code or browser evidence; `Partial` identifies a limitation. The PDF's submission instructions are documented here but are not treated as authorization to publish or post externally.
+This checklist describes the earlier frontend-only Agriculture Management System assignment. It is retained as project history. The active source of truth is the U Devs Batch 6 Backend Development Guide; see [BACKEND_IMPLEMENTATION_CHECKLIST.md](BACKEND_IMPLEMENTATION_CHECKLIST.md) for the current implementation and verification status. Statements below about localStorage-backed records, mock authentication, and no backend are no longer current.
 
 | # | PDF page | Requirement | Status | Evidence / limitation |
 |---:|---:|---|---|---|

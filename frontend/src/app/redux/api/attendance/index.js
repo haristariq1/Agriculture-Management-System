@@ -1,0 +1,1 @@
+import { resource } from '../crud'; const api = resource('/attendance'); export const getattendance = api.get; export const markattendance = api.add; export const updateattendance = api.update; export const removeattendance = api.remove;

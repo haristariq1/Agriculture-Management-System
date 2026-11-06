@@ -1,0 +1,4 @@
+const { Op } = require('sequelize'); const Task = require('../models/taskModel'); const crud = require('../utils/crudFactory')(Task, 'task'); const { ok, fail } = require('../utils/response');
+crud.getAll = async (_req, res) => { try { const today = new Date().toISOString().slice(0, 10); await Task.update({ status: 'Overdue' }, { where: { status: 'Pending', dueDate: { [Op.lt]: today } } }); return ok(res, await Task.findAll({ order: [['createdAt', 'DESC']] })); } catch (e) { return fail(res, e.message, 500); } };
+crud.getOne = async (req, res) => { try { const row = await Task.findByPk(req.params.id); if (!row) return fail(res, 'Task not found', 404); if (row.status === 'Pending' && row.dueDate < new Date().toISOString().slice(0, 10)) await row.update({ status: 'Overdue' }); return ok(res, row); } catch (e) { return fail(res, e.message, 500); } };
+module.exports = crud;

@@ -1,0 +1,2 @@
+const express = require('express'); const { protect, authorize } = require('../middleware/authMiddleware');
+module.exports = (controller) => { const router = express.Router(); router.use(protect); router.get('/', controller.getAll); router.get('/:id', controller.getOne); router.post('/', controller.create); router.put('/:id', authorize('admin'), controller.update); router.delete('/:id', authorize('admin'), controller.remove); return router; };
