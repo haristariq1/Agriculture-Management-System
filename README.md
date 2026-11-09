@@ -147,3 +147,4 @@ Never commit `.env`, PostgreSQL credentials, JWT secrets, `node_modules`, build 
 ## Assignment
 
 U Devs Batch 6 — Backend Development Guide. Developer: Haris Tariq.
+# Complete-Agriculture-Management-System-
