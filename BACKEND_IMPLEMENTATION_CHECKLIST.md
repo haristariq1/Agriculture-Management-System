@@ -24,7 +24,7 @@ Source: *Backend Development Guide – Batch 6: Node.js + Express + PostgreSQL +
 | 18 | 8.14–8.15 | Express security, CORS, rate limiting, JSON handling, static images, health, DB sync and seed script | Complete | Server started on port 5001 (local port 5000 occupied); live `/api/health` returned 200; seed completed |
 | 19 | 10 | Axios base URL, JWT request header, expired-session handling and backend error messages | Complete | Shared Axios client reads `agri_session`, normalizes API errors, and clears/redirects on 401 |
 | 20 | 10 | Existing Redux actions/reducers and request/success/failure flow remain compatible | Complete | Existing async thunks/reducers retained; adapters normalize login/user response shapes |
-| 21 | 10 | Signup route/form and role-aware UI actions | Complete | Manager signup form/route added; Admin-only edit/delete controls remain role-gated |
+| 21 | 10 | Account registration and role-aware UI actions | Complete | Admin-only User Registration page supports Admin/Manager role selection; route and API both enforce Admin access |
 | 22 | 10 | Buyer photo URL works in existing UI | Complete | Forms send multipart `photo`; table/details build image URL from API base |
 | 23 | 10 | Redux selectors still derive dashboard/report metrics from API-loaded state | Complete | Existing dashboard selectors retained; payroll selector now recognizes database-linked wage expenses |
 | 24 | 10 | Browser localStorage retains auth session after refresh without storing application records | Complete | Persistence middleware stores only session and theme; startup rehydrates token session; records load from PostgreSQL |

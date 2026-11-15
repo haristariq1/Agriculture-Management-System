@@ -15,10 +15,10 @@ describe('backend API adapters', () => {
     client.get.mockResolvedValue({ data: { succeeded: true, message: 'OK', data: { users: [{ id: 'u2', role: 'manager' }] } } });
     expect((await getAllUsers()).data.data).toEqual([{ id: 'u2', role: 'Manager' }]);
   });
-  it('registers managers and maps frontend roles before admin user writes', async () => {
+  it('registers an Admin-selected role and maps frontend roles before admin user writes', async () => {
     client.post.mockResolvedValue(response({ id: 'u3', role: 'manager' }));
-    await register({ fullName: 'New Manager', username: 'farmmanager', email: 'manager@example.test', password: 'secret123' });
-    expect(client.post).toHaveBeenCalledWith('/users/register', { fullName: 'New Manager', username: 'farmmanager', email: 'manager@example.test', password: 'secret123' });
+    await register({ fullName: 'New Manager', username: 'farmmanager', email: 'manager@example.test', password: 'secret123', role: 'Manager' });
+    expect(client.post).toHaveBeenCalledWith('/users/register', { fullName: 'New Manager', username: 'farmmanager', email: 'manager@example.test', password: 'secret123', role: 'Manager' });
     client.post.mockResolvedValue(response({ id: 'u4', role: 'admin' }));
     await create({ fullName: 'New Admin', username: 'newadmin', email: 'admin@example.test', password: 'secret123', role: 'Admin' });
     expect(client.post).toHaveBeenCalledWith('/users', expect.objectContaining({ role: 'admin' }));

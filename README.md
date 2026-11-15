@@ -4,7 +4,7 @@ Full-stack U Devs Batch 6 agriculture management application. The existing React
 
 ## Features
 
-- Protected JWT login/logout, Manager signup, Admin and Manager authorization enforced by the API.
+- Protected JWT login/logout and Admin-only account registration with Admin/Manager role selection.
 - Dashboard analytics, crop health, harvest and order summaries, alerts, humidity and Open-Meteo forecast.
 - Crops, harvest orders, buyers, farm tasks, expenses/profit, inputs inventory, workers, daily attendance, wages, equipment, maintenance, reports, CSV/PDF export, and audit activity.
 - CNIC and phone validation; duplicate CNIC/attendance prevention; buyer JPG/PNG upload with a 1 MB limit; stock checks under a database transaction.
@@ -73,7 +73,7 @@ Seed these accounts into the database with `npm run seed` from `backend/`:
 | Admin | `admin` | `Admin@123` |
 | Manager | `manager` | `Manager@123` |
 
-Signup creates a Manager account. Change demo passwords before using a publicly accessible deployment.
+Only an authenticated Admin can register users from the **User Registration** page. The Admin selects an Admin or Manager role. Newly registered accounts can sign in immediately. Change demo passwords before using a publicly accessible deployment.
 
 ## API reference
 
@@ -81,7 +81,7 @@ All endpoints are under `/api`. Protected routes require `Authorization: Bearer 
 
 | Resource | Routes | Manager | Admin |
 | --- | --- | --- | --- |
-| Authentication | `POST /users/register`, `POST /users/login`, `GET /users/me`, `POST /users/logout` | Register/login/session | Register/login/session |
+| Authentication | `POST /users/register`, `POST /users/login`, `GET /users/me`, `POST /users/logout` | Admin registers accounts; login/session | Login/session; registration denied with HTTP 403 |
 | Users | `GET /users`, `GET /users/:id`, `POST /users`, `PUT /users/:id`, `DELETE /users/:id` | No access | Full access |
 | Crops, orders, buyers, tasks, expenses, inventory, workers, attendance, equipment, maintenance | `GET /:resource`, `GET /:resource/:id`, `POST /:resource`, `PUT /:resource/:id`, `DELETE /:resource/:id` | View and add | Full access |
 | Buyers | `POST/PUT /buyers` multipart form, photo field `photo` | View and add | Full access |

@@ -43,6 +43,7 @@ export const userReducer = (state = initial, action) => {
     });
     if (operation === "login") changes.user = action.payload;
     if (operation === "getall") changes.allUsers = action.payload;
+    if (operation === "signup") changes.allUsers = [...state.allUsers, action.payload];
     if (operation === "get") changes.requestedUser = action.payload;
     if (operation === "create")
       changes.allUsers = [...state.allUsers, action.payload];

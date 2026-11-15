@@ -26,10 +26,10 @@ import Signup from "./views/Signup";
 function Shell() {
   const dispatch = useDispatch();
   const ui = useSelector((s) => s.ui);
+  const user = useSelector((s) => s.user.user);
   useWeather();
   useEffect(() => {
     [
-      "GETALLUSERS",
       "GETCROPS",
       "GETORDERS",
       "GETBUYERS",
@@ -41,8 +41,10 @@ function Shell() {
       "GETEQUIPMENT",
       "GETMAINTENANCE",
     ].forEach((name) => dispatch(actions[name]()).catch(() => {}));
-    dispatch(GETACTIVITY());
-  }, [dispatch]);
+    if (user?.role === "Admin") {
+      dispatch(GETACTIVITY());
+    }
+  }, [dispatch, user?.role]);
   useEffect(() => {
     if (ui.toast) {
       const id = setTimeout(() => dispatch(HIDETOAST()), 3500);
@@ -66,6 +68,7 @@ function Shell() {
             <Route path="/workers" element={<Workers />} />
             <Route path="/equipment" element={<Equipment />} />
             <Route path="/reports" element={<Reports />} />
+            <Route path="/users" element={<ProtectedRoute roles={["Admin"]}><Signup /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
@@ -78,7 +81,6 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
       <Route
         path="/*"
         element={

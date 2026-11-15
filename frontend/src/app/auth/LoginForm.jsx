@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { LOGIN } from "../redux/actions/users";
-import { Link } from "react-router-dom";
 export default function LoginForm() {
   const [username, setUsername] = useState("admin"),
     [password, setPassword] = useState("Admin@123"),
@@ -43,7 +42,6 @@ export default function LoginForm() {
         {loading ? "Signing in..." : "Sign in"}{" "}
         <i className="bi bi-arrow-right ms-2" />
       </button>
-      <p className="text-center mt-3 mb-0">New to the workspace? <Link to="/signup">Create a Manager account</Link></p>
       <div className="demo-credentials">
         <strong>Demo credentials</strong>
         <div>Admin: admin / Admin@123</div>

@@ -9,9 +9,12 @@ test('authenticated farm workflows, permissions, validation, linked expenses, an
   assert.equal(admin.role, 'admin'); assert.ok(admin.token); assert.equal(manager.role, 'manager');
   await request(app).get('/api/crops').expect(401);
   const signupName = `newmanager${Date.now()}`;
-  const signup = await request(app).post('/api/users/register').send({ fullName: 'Registered Manager', username: signupName, email: `${signupName}@example.test`, password: 'secret123' }).expect(201);
+  const registrationPayload = { fullName: 'Registered Manager', username: signupName, email: `${signupName}@example.test`, password: 'secret123', role: 'Manager' };
+  await request(app).post('/api/users/register').send(registrationPayload).expect(401);
+  await request(app).post('/api/users/register').set('Authorization', `Bearer ${manager.token}`).send(registrationPayload).expect(403);
+  const signup = await request(app).post('/api/users/register').set('Authorization', `Bearer ${admin.token}`).send(registrationPayload).expect(201);
   assert.equal(signup.body.data.role, 'manager');
-  await request(app).post('/api/users/register').send({ fullName: 'Duplicate Manager', username: signupName, email: `${signupName}@example.test`, password: 'secret123' }).expect(409);
+  await request(app).post('/api/users/register').set('Authorization', `Bearer ${admin.token}`).send(registrationPayload).expect(409);
   const signedUp = await request(app).post('/api/users/login').send({ username: signupName, password: 'secret123' }).expect(200);
   await request(app).get('/api/users/me').set('Authorization', `Bearer ${signedUp.body.user.token}`).expect(200);
   const managedUser = await request(app).post('/api/users').set('Authorization', `Bearer ${admin.token}`).send({ fullName: 'Managed Account', username: `managed${Date.now()}`, email: `managed${Date.now()}@example.test`, password: 'secret123', role: 'manager' }).expect(201);
