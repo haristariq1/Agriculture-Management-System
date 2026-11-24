@@ -1,1 +1,4 @@
-module.exports = require('../utils/crudFactory')(require('../models/orderModel'), 'order');
+module.exports = require("../utils/crudFactory")(
+  require("../models/orderModel"),
+  "order"
+);

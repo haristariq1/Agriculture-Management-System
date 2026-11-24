@@ -1,1 +1,3 @@
-module.exports = require('../utils/crudRoutes')(require('../controllers/attendanceController'));
+module.exports = require("../utils/crudRoutes")(
+  require("../controllers/attendanceController")
+);

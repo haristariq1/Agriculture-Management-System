@@ -1,1 +1,3 @@
-module.exports = require('../utils/crudRoutes')(require('../controllers/workerController'));
+module.exports = require("../utils/crudRoutes")(
+  require("../controllers/workerController")
+);

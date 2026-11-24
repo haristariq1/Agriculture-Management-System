@@ -52,7 +52,7 @@ export const userReducer = (state = initial, action) => {
         x.id === action.payload.id ? action.payload : x,
       );
     if (operation === "update" && state.user?.id === action.payload.id)
-      changes.user = action.payload;
+      changes.user = { ...action.payload, token: state.user.token };
     if (operation === "remove")
       changes.allUsers = state.allUsers.filter(
         (x) => x.id !== action.payload.id,

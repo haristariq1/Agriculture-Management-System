@@ -1,1 +1,3 @@
-module.exports = require('../utils/crudRoutes')(require('../controllers/taskController'));
+module.exports = require("../utils/crudRoutes")(
+  require("../controllers/taskController")
+);

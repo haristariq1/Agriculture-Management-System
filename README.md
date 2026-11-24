@@ -4,7 +4,7 @@ Full-stack U Devs Batch 6 agriculture management application. The existing React
 
 ## Features
 
-- Protected JWT login/logout and Admin-only account registration with Admin/Manager role selection.
+- Protected JWT login/logout and an Admin-only user-management page to register Admin/Manager accounts, view the registered users, and delete other accounts. Deletion requires confirmation; the active Admin cannot delete their own account.
 - Dashboard analytics, crop health, harvest and order summaries, alerts, humidity and Open-Meteo forecast.
 - Crops, harvest orders, buyers, farm tasks, expenses/profit, inputs inventory, workers, daily attendance, wages, equipment, maintenance, reports, CSV/PDF export, and audit activity.
 - CNIC and phone validation; duplicate CNIC/attendance prevention; buyer JPG/PNG upload with a 1 MB limit; stock checks under a database transaction.
@@ -68,9 +68,9 @@ Open <http://localhost:5173>. Set `VITE_API_URL` to the API base URL if it diffe
 
 Seed these accounts into the database with `npm run seed` from `backend/`:
 
-| Role | Username | Password |
-| --- | --- | --- |
-| Admin | `admin` | `Admin@123` |
+| Role    | Username  | Password      |
+| ------- | --------- | ------------- |
+| Admin   | `admin`   | `Admin@123`   |
 | Manager | `manager` | `Manager@123` |
 
 Only an authenticated Admin can register users from the **User Registration** page. The Admin selects an Admin or Manager role. Newly registered accounts can sign in immediately. Change demo passwords before using a publicly accessible deployment.
@@ -79,16 +79,16 @@ Only an authenticated Admin can register users from the **User Registration** pa
 
 All endpoints are under `/api`. Protected routes require `Authorization: Bearer <JWT>`. Success responses use `{ "succeeded": true, "message": "...", "data": ... }`; errors include a message and HTTP status.
 
-| Resource | Routes | Manager | Admin |
-| --- | --- | --- | --- |
-| Authentication | `POST /users/register`, `POST /users/login`, `GET /users/me`, `POST /users/logout` | Admin registers accounts; login/session | Login/session; registration denied with HTTP 403 |
-| Users | `GET /users`, `GET /users/:id`, `POST /users`, `PUT /users/:id`, `DELETE /users/:id` | No access | Full access |
-| Crops, orders, buyers, tasks, expenses, inventory, workers, attendance, equipment, maintenance | `GET /:resource`, `GET /:resource/:id`, `POST /:resource`, `PUT /:resource/:id`, `DELETE /:resource/:id` | View and add | Full access |
-| Buyers | `POST/PUT /buyers` multipart form, photo field `photo` | View and add | Full access |
-| Inventory usage | `POST /inventory/:id/usage` | Record usage | Record usage |
-| Wage payment | `POST /expenses/pay-wages` with `{ workerId, month }` | Pay wages | Pay wages |
-| Activity | `GET /activity` | Read | Read |
-| Health | `GET /health` | Public | Public |
+| Resource                                                                                       | Routes                                                                                                   | Manager                                 | Admin                                            |
+| ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------- | ------------------------------------------------ |
+| Authentication                                                                                 | `POST /users/register`, `POST /users/login`, `GET /users/me`, `POST /users/logout`                       | Admin registers accounts; login/session | Login/session; registration denied with HTTP 403 |
+| Users                                                                                          | `GET /users`, `GET /users/:id`, `POST /users`, `PUT /users/:id`, `DELETE /users/:id`                     | No access                               | Full access                                      |
+| Crops, orders, buyers, tasks, expenses, inventory, workers, attendance, equipment, maintenance | `GET /:resource`, `GET /:resource/:id`, `POST /:resource`, `PUT /:resource/:id`, `DELETE /:resource/:id` | View and add                            | Full access                                      |
+| Buyers                                                                                         | `POST/PUT /buyers` multipart form, photo field `photo`                                                   | View and add                            | Full access                                      |
+| Inventory usage                                                                                | `POST /inventory/:id/usage`                                                                              | Record usage                            | Record usage                                     |
+| Wage payment                                                                                   | `POST /expenses/pay-wages` with `{ workerId, month }`                                                    | Pay wages                               | Pay wages                                        |
+| Activity                                                                                       | `GET /activity`                                                                                          | Read                                    | Read                                             |
+| Health                                                                                         | `GET /health`                                                                                            | Public                                  | Public                                           |
 
 Each resource’s update and delete endpoints are Admin-only and return 403 to Managers. Buyer photo files are served from `/images/<filename>`.
 
@@ -147,4 +147,5 @@ Never commit `.env`, PostgreSQL credentials, JWT secrets, `node_modules`, build 
 ## Assignment
 
 U Devs Batch 6 — Backend Development Guide. Developer: Haris Tariq.
+
 # Complete-Agriculture-Management-System-

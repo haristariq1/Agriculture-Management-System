@@ -1,1 +1,5 @@
-const router = require('express').Router(); const c = require('../controllers/activityController'); const { protect } = require('../middleware/authMiddleware'); router.get('/', protect, c.getAll); module.exports = router;
+const router = require("express").Router();
+const c = require("../controllers/activityController");
+const { protect } = require("../middleware/authMiddleware");
+router.get("/", protect, c.getAll);
+module.exports = router;

@@ -1,2 +1,31 @@
-const { DataTypes } = require('sequelize'); const sequelize = require('../config/db');
-module.exports = sequelize.define('Inventory', { id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true }, item: { type: DataTypes.STRING(100), allowNull: false }, type: { type: DataTypes.ENUM('Fertilizer', 'Pesticide', 'Seed'), allowNull: false }, qty: { type: DataTypes.DECIMAL(12, 2), allowNull: false, validate: { min: 0 } }, minQty: { type: DataTypes.DECIMAL(12, 2), allowNull: false, defaultValue: 0, validate: { min: 0 } }, unit: { type: DataTypes.STRING(30), allowNull: false }, usageHistory: { type: DataTypes.JSONB, allowNull: false, defaultValue: [] } }, { tableName: 'inventory', timestamps: true });
+const { DataTypes } = require("sequelize");
+const sequelize = require("../config/db");
+module.exports = sequelize.define(
+  "Inventory",
+  {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
+    item: { type: DataTypes.STRING(100), allowNull: false },
+    type: {
+      type: DataTypes.ENUM("Fertilizer", "Pesticide", "Seed"),
+      allowNull: false,
+    },
+    qty: {
+      type: DataTypes.DECIMAL(12, 2),
+      allowNull: false,
+      validate: { min: 0 },
+    },
+    minQty: {
+      type: DataTypes.DECIMAL(12, 2),
+      allowNull: false,
+      defaultValue: 0,
+      validate: { min: 0 },
+    },
+    unit: { type: DataTypes.STRING(30), allowNull: false },
+    usageHistory: { type: DataTypes.JSONB, allowNull: false, defaultValue: [] },
+  },
+  { tableName: "inventory", timestamps: true }
+);

@@ -20,7 +20,7 @@ export default function Sidebar() {
       </div>
       <div className="sidebar-label">WORKSPACE</div>
       <nav>
-        {[...routes, ...(user?.role === "Admin" ? [["/users", "User Registration", "bi-person-plus"]] : [])].map(([path, label, icon]) => (
+        {[...routes, ...(user?.role === "Admin" ? [["/users", "User Management", "bi-person-plus"]] : [])].map(([path, label, icon]) => (
           <NavLink
             key={path}
             to={path}
